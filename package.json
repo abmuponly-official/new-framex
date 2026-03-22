@@ -5,9 +5,12 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
+    "build:cf": "next build",
     "start": "next start -p 3000",
     "lint": "next lint",
-    "type-check": "tsc --noEmit"
+    "type-check": "tsc --noEmit",
+    "deploy": "npm run build && wrangler pages deploy .next --project-name framex",
+    "deploy:prod": "npm run build && wrangler pages deploy .next --project-name framex --branch main"
   },
   "dependencies": {
     "@supabase/ssr": "^0.5.2",

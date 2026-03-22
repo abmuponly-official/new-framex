@@ -2,6 +2,8 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import type { Project } from '@/types/content';
+import ImageUploader from './ImageUploader';
+import MultiImageUploader from './MultiImageUploader';
 
 type Mode = 'create' | 'edit';
 
@@ -39,6 +41,9 @@ export default function ProjectForm({ mode, initialData, userId }: Props) {
   const [year, setYear]                 = useState(String(initialData?.year ?? new Date().getFullYear()));
   const [tags, setTags]                 = useState((initialData?.tags ?? []).join(', '));
   const [coverImage, setCoverImage]     = useState(initialData?.cover_image ?? '');
+  const [galleryUrls, setGalleryUrls]   = useState<string[]>(
+    (initialData?.gallery ?? []).map((g: { url: string }) => g.url)
+  );
   const [featured, setFeatured]         = useState(initialData?.featured ?? false);
   const [hasWatertest, setHasWatertest] = useState(initialData?.has_watertest ?? false);
   const [hasCo, setHasCo]              = useState(initialData?.has_co ?? false);
@@ -78,6 +83,7 @@ export default function ProjectForm({ mode, initialData, userId }: Props) {
       year: year ? parseInt(year, 10) : null,
       tags: tags.split(',').map(t => t.trim()).filter(Boolean),
       cover_image: coverImage,
+      gallery: galleryUrls.map((url) => ({ url, caption_vi: '', caption_en: '' })),
       featured, has_watertest: hasWatertest, has_co: hasCo,
       status: publish ? 'published' : status,
       meta_title_vi: metaTitleVi, meta_title_en: metaTitleEn,
@@ -315,28 +321,22 @@ export default function ProjectForm({ mode, initialData, userId }: Props) {
       {/* ── Tab: Media ───────────────────────────────────────────── */}
       {tab === 'media' && (
         <div className="admin-card">
-          <div className="form-group">
-            <label className="form-label">Ảnh bìa (Cover image URL)</label>
-            <input
-              className="form-input"
+          <div className="form-group" style={{ marginBottom: 32 }}>
+            <ImageUploader
+              label="Ảnh bìa (Cover image)"
               value={coverImage}
-              onChange={e => setCoverImage(e.target.value)}
-              placeholder="https://… hoặc /images/tue-house.jpg"
+              onChange={setCoverImage}
+              folder="projects"
+              hint="Tỷ lệ khuyến nghị 4:3, WebP, tối đa 5MB. Ảnh này hiển thị trên danh sách dự án."
             />
-            <p className="form-hint">Dán URL ảnh từ Supabase Storage, Cloudinary, hoặc upload manual.</p>
           </div>
-          {coverImage && (
-            <div style={{ marginTop: 12 }}>
-              <img src={coverImage} alt="Preview" style={{ maxWidth: 320, borderRadius: 8, border: '1px solid #e5e7eb' }} />
-            </div>
-          )}
-          <div style={{ marginTop: 24, padding: '16px', background: '#f9fafb', borderRadius: 8, fontSize: 13, color: '#6b7280' }}>
-            <strong>Hướng dẫn upload ảnh:</strong><br />
-            1. Vào <strong>Supabase → Storage → framex-media</strong> bucket<br />
-            2. Upload ảnh vào thư mục <code>projects/</code><br />
-            3. Copy public URL và dán vào ô trên<br /><br />
-            Định dạng khuyến nghị: <strong>WebP</strong>, tối đa 2MB, tỷ lệ 4:3.
-          </div>
+          <MultiImageUploader
+            label="Thư viện ảnh dự án (Gallery)"
+            value={galleryUrls}
+            onChange={setGalleryUrls}
+            folder="projects"
+            maxImages={20}
+          />
         </div>
       )}
 

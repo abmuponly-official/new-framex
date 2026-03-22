@@ -9,9 +9,11 @@ const NAV = [
   { section: 'Nội dung' },
   { href: '/admin/projects', label: 'Dự án', icon: '🏗️' },
   { href: '/admin/posts', label: 'Bài viết / Blog', icon: '📝' },
+  { href: '/admin/media', label: 'Thư viện Media', icon: '🖼️' },
   { section: 'Vận hành' },
   { href: '/admin/leads', label: 'Khách hàng tiềm năng', icon: '📬' },
   { section: 'Hệ thống' },
+  { href: '/admin/users', label: 'Người dùng', icon: '👥' },
   { href: '/admin/settings', label: 'Cài đặt', icon: '⚙️' },
   { href: '/admin/audit', label: 'Nhật ký thay đổi', icon: '📋' },
 ];

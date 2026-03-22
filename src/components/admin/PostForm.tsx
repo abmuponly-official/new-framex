@@ -2,6 +2,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import type { Post } from '@/types/content';
+import ImageUploader from './ImageUploader';
 
 type Mode = 'create' | 'edit';
 interface Props { mode: Mode; initialData?: Partial<Post>; userId: string; }
@@ -139,8 +140,13 @@ export default function PostForm({ mode, initialData, userId }: Props) {
           </div>
 
           <div className="form-group">
-            <label className="form-label">Ảnh bìa (URL)</label>
-            <input className="form-input" value={coverImage} onChange={e => setCoverImage(e.target.value)} placeholder="https://…" />
+            <ImageUploader
+              label="Ảnh bìa"
+              value={coverImage}
+              onChange={setCoverImage}
+              folder="posts"
+              hint="Tỷ lệ khuyến nghị 16:9 hoặc 2:1, WebP, tối đa 5MB."
+            />
           </div>
 
           <div className="form-group">
