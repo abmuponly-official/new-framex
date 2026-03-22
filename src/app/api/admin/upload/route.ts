@@ -108,8 +108,45 @@ export async function POST(request: Request) {
 }
 
 /**
- * GET /api/admin/upload?folder=projects
- * Returns list of files in a folder
+ * All known subfolders in the framex-media bucket.
+ * Add new folders here when new upload routes are created.
+ */
+const ALL_FOLDERS = ['projects', 'posts', 'settings', 'general', 'brochures'];
+
+/**
+ * List files in one folder and attach public URLs.
+ * Filters out directory stub entries (id === null).
+ */
+async function listFolder(
+  admin: ReturnType<typeof createAdminClient>,
+  folderName: string,
+  limit: number,
+  offset: number,
+) {
+  const { data, error } = await admin.storage
+    .from(BUCKET)
+    .list(folderName, {
+      limit,
+      offset,
+      sortBy: { column: 'created_at', order: 'desc' },
+    });
+
+  if (error || !data) return [];
+
+  // id === null means it is a directory stub, not a real file — skip it
+  return data
+    .filter((f) => f.id !== null)
+    .map((f) => {
+      const filePath = `${folderName}/${f.name}`;
+      const { data: { publicUrl } } = admin.storage.from(BUCKET).getPublicUrl(filePath);
+      return { ...f, url: publicUrl, path: filePath, folder: folderName };
+    });
+}
+
+/**
+ * GET /api/admin/upload?folder=projects   → list specific folder
+ * GET /api/admin/upload?folder=           → list ALL folders merged
+ * GET /api/admin/upload                   → list ALL folders merged
  */
 export async function GET(request: Request) {
   try {
@@ -118,30 +155,35 @@ export async function GET(request: Request) {
     if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
     const { searchParams } = new URL(request.url);
-    const folder = searchParams.get('folder') || '';
-    const limit = parseInt(searchParams.get('limit') ?? '50', 10);
-    const offset = parseInt(searchParams.get('offset') ?? '0', 10);
+    const folderParam = searchParams.get('folder') ?? '';
+    const limit  = parseInt(searchParams.get('limit')  ?? '200', 10);
+    const offset = parseInt(searchParams.get('offset') ?? '0',   10);
 
     const admin = createAdminClient();
-    const { data, error } = await admin.storage
-      .from(BUCKET)
-      .list(folder, {
-        limit,
-        offset,
-        sortBy: { column: 'created_at', order: 'desc' },
-      });
 
-    if (error) return NextResponse.json({ error: error.message }, { status: 400 });
+    let files: object[];
 
-    // Attach public URLs
-    const files = (data ?? []).map((f) => {
-      const path = folder ? `${folder}/${f.name}` : f.name;
-      const { data: { publicUrl } } = admin.storage.from(BUCKET).getPublicUrl(path);
-      return { ...f, url: publicUrl, path };
-    });
+    if (folderParam === '' || folderParam === 'all') {
+      // ── ALL: list every known subfolder in parallel and merge ───────────
+      // Supabase Storage does NOT support recursive listing from root ('').
+      // Calling list('') returns folder-name stubs, not actual files.
+      const results = await Promise.all(
+        ALL_FOLDERS.map((f) => listFolder(admin, f, limit, offset))
+      );
+      files = results.flat().sort(
+        // sort merged result by created_at desc
+        (a, b) =>
+          new Date((b as { created_at?: string }).created_at ?? 0).getTime() -
+          new Date((a as { created_at?: string }).created_at ?? 0).getTime()
+      );
+    } else {
+      // ── Specific folder ─────────────────────────────────────────────────
+      files = await listFolder(admin, folderParam, limit, offset);
+    }
 
-    return NextResponse.json({ files, folder });
-  } catch {
+    return NextResponse.json({ files, folder: folderParam });
+  } catch (err) {
+    console.error('[media GET]', err);
     return NextResponse.json({ error: 'Server error' }, { status: 500 });
   }
 }
