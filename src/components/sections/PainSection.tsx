@@ -54,12 +54,28 @@ export default async function PainSection({ locale }: Props) {
             {t('pain_headline')}
           </h2>
 
-          {/* Sub */}
+          {/* Sub — one-liner */}
           <p
             className="mt-4 text-base reveal reveal-delay-2"
             style={{ color: 'rgba(255,255,255,0.45)', maxWidth: '52ch', lineHeight: '1.7' }}
           >
             {t('pain_sub')}
+          </p>
+
+          {/* Body — full narrative paragraph from doc */}
+          <p
+            className="mt-6 reveal reveal-delay-2"
+            style={{
+              fontFamily: 'Inter, sans-serif',
+              fontWeight: 300,
+              fontSize: 'clamp(0.875rem, 1.4vw, 1rem)',
+              color: 'rgba(255,255,255,0.32)',
+              lineHeight: '1.85',
+              maxWidth: '60ch',
+              letterSpacing: '0.005em',
+            }}
+          >
+            {t('pain_body')}
           </p>
         </div>
 
