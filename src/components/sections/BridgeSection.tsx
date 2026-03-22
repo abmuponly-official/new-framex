@@ -1,13 +1,17 @@
 import { getTranslations } from 'next-intl/server';
 import type { Locale } from '@/lib/i18n/request';
+import BridgeParallax from './BridgeParallax';
 
 type Props = { locale: Locale };
 
 /*
- * BridgeSection — Section 3 of the landing page.
- * Full-screen dark section with an architectural image background,
- * heavy dark overlay, and centered quote.
- * Image: steel frame architecture (Pexels CC0 — pexels.com/photo/4067521)
+ * BridgeSection — Section 3 "Khoảng chuyển từ tĩnh lặng sang logic"
+ * Motion design:
+ *   — Background: very subtle parallax via BridgeParallax (client, ±18px max)
+ *   — Primary paragraph: scroll-reveal, fade-up 20px, 1.1s, delay 0
+ *   — Supporting paragraph: scroll-reveal, fade-up 12px, 1.0s, delay 0.35s
+ *     → the gap between the two paragraphs arriving gives a breathing pause
+ * No CTA, no attribution, no eyebrow, no divider.
  */
 export default async function BridgeSection({ locale }: Props) {
   const t = await getTranslations({ locale, namespace: 'home' });
@@ -16,89 +20,75 @@ export default async function BridgeSection({ locale }: Props) {
     <section
       className="relative section-screen overflow-hidden"
       aria-label="Bridge statement"
-      style={{ background: '#1A1A1A' }}
+      style={{ background: '#0E0E0E' }}
     >
-      {/* ── Background architectural image with strong dark overlay ── */}
+      {/* ── Background with subtle parallax (client component) ── */}
+      <BridgeParallax />
+
+      {/* ── Deep overlay — legibility, meditative darkness ── */}
       <div
-        className="absolute inset-0"
+        className="absolute inset-0 z-[1]"
         aria-hidden="true"
         style={{
-          backgroundImage: 'url(https://images.pexels.com/photos/4067521/pexels-photo-4067521.jpeg?auto=compress&cs=tinysrgb&w=1600)',
-          backgroundSize: 'cover',
-          backgroundPosition: 'center 40%',
-          backgroundRepeat: 'no-repeat',
+          background:
+            'linear-gradient(to bottom, rgba(8,8,8,0.93) 0%, rgba(12,12,12,0.87) 45%, rgba(8,8,8,0.95) 100%)',
         }}
-      />
-      {/* Multi-layer overlay for depth and text legibility */}
-      <div
-        className="absolute inset-0"
-        aria-hidden="true"
-        style={{ background: 'linear-gradient(to bottom, rgba(17,17,17,0.88) 0%, rgba(26,26,26,0.82) 50%, rgba(17,17,17,0.92) 100%)' }}
-      />
-      {/* Orange glow from bottom-right — very subtle */}
-      <div
-        className="absolute inset-0 pointer-events-none"
-        aria-hidden="true"
-        style={{ background: 'radial-gradient(ellipse 60% 50% at 80% 80%, rgba(255,107,53,0.05) 0%, transparent 60%)' }}
       />
 
       {/* ── Content ── */}
-      <div className="relative z-10 container-base w-full py-24">
-        <div className="max-w-3xl mx-auto text-center">
+      <div className="relative z-10 container-base w-full">
+        <div style={{ maxWidth: '44rem' }}>
 
-          {/* Orange accent line */}
-          <div className="flex justify-center mb-10 reveal">
-            <span className="divider-accent" aria-hidden="true" />
-          </div>
-
-          {/* Primary quote */}
-          <blockquote className="reveal reveal-delay-1">
-            <p
-              className="font-display font-bold text-balance"
-              style={{
-                fontFamily: 'Montserrat, sans-serif',
-                fontSize: 'clamp(1.5rem, 3.5vw, 2.5rem)',
-                color: '#FFFFFF',
-                lineHeight: '1.2',
-                letterSpacing: '-0.02em',
-              }}
-            >
-              {t('bridge')}
-            </p>
-          </blockquote>
-
-          {/* Supporting paragraph */}
+          {/* Primary — big statement, heavier reveal */}
           <p
-            className="mt-8 text-base reveal reveal-delay-2"
+            className="reveal"
             style={{
-              color: 'rgba(255,255,255,0.5)',
-              lineHeight: '1.75',
-              maxWidth: '52ch',
-              margin: '2rem auto 0',
+              fontFamily: 'Montserrat, sans-serif',
+              fontWeight: 500,
+              fontSize: 'clamp(1.375rem, 3.2vw, 2.125rem)',
+              color: '#FFFFFF',
+              lineHeight: '1.48',
+              letterSpacing: '-0.02em',
+              textWrap: 'balance',
+              marginBottom: '2.25rem',
+              /* delay 0 — arrives first when section enters viewport */
+              transitionDelay: '0s',
+            }}
+          >
+            {t('bridge')}
+          </p>
+
+          {/* Supporting — quieter, arrives 0.35s later — breathing pause */}
+          <p
+            className="reveal"
+            style={{
+              fontFamily: 'Inter, sans-serif',
+              fontWeight: 300,
+              fontSize: 'clamp(0.9375rem, 1.5vw, 1.0625rem)',
+              color: 'rgba(255,255,255,0.38)',
+              lineHeight: '1.8',
+              letterSpacing: '0.005em',
+              maxWidth: '40rem',
+              transitionDelay: '0.35s',
             }}
           >
             {t('bridge_sub')}
           </p>
 
-          {/* FrameX attribution */}
-          <div className="mt-12 flex justify-center items-center gap-3 reveal reveal-delay-3">
-            <span className="divider-accent" style={{ width: '1.5rem' }} aria-hidden="true" />
-            <span
-              className="text-xs tracking-[0.16em] uppercase"
-              style={{ color: 'rgba(255,255,255,0.3)', fontFamily: 'Inter, sans-serif' }}
-            >
-              FrameX
-            </span>
-          </div>
-
         </div>
       </div>
 
-      {/* ── Bottom scroll nudge ── */}
-      <div className="absolute bottom-8 left-1/2 -translate-x-1/2" aria-hidden="true">
+      {/* ── Bottom scroll line ── */}
+      <div
+        className="absolute bottom-10 left-1/2 -translate-x-1/2 z-10"
+        aria-hidden="true"
+      >
         <div
-          className="w-px h-10 animate-pulse"
-          style={{ background: 'linear-gradient(to bottom, transparent, rgba(255,107,53,0.4))' }}
+          style={{
+            width: '1px',
+            height: '2.5rem',
+            background: 'linear-gradient(to bottom, transparent, rgba(255,107,53,0.22))',
+          }}
         />
       </div>
     </section>
