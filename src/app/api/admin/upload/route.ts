@@ -5,8 +5,16 @@ import { createAdminClient } from '@/lib/supabase/admin';
 export const runtime = 'nodejs'; // Required for file handling
 
 const BUCKET = 'framex-media';
-const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5 MB
-const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif', 'image/svg+xml'];
+const IMAGE_MAX_SIZE = 5 * 1024 * 1024;   // 5 MB for images
+const PDF_MAX_SIZE   = 20 * 1024 * 1024;  // 20 MB for PDF
+const ALLOWED_TYPES = [
+  'image/jpeg',
+  'image/png',
+  'image/webp',
+  'image/gif',
+  'image/svg+xml',
+  'application/pdf',
+];
 
 /**
  * POST /api/admin/upload
@@ -37,15 +45,16 @@ export async function POST(request: Request) {
     // Validate file type
     if (!ALLOWED_TYPES.includes(file.type)) {
       return NextResponse.json(
-        { error: `File type not allowed. Allowed: ${ALLOWED_TYPES.join(', ')}` },
+        { error: `Loại file không được phép. Cho phép: ảnh (JPEG/PNG/WebP/GIF/SVG) và PDF.` },
         { status: 400 }
       );
     }
 
-    // Validate file size
-    if (file.size > MAX_FILE_SIZE) {
+    // Validate file size (PDF up to 20 MB, images up to 5 MB)
+    const maxSize = file.type === 'application/pdf' ? PDF_MAX_SIZE : IMAGE_MAX_SIZE;
+    if (file.size > maxSize) {
       return NextResponse.json(
-        { error: `File too large. Max size: ${MAX_FILE_SIZE / 1024 / 1024}MB` },
+        { error: `File quá lớn. Tối đa: ${maxSize / 1024 / 1024}MB cho loại ${file.type === 'application/pdf' ? 'PDF' : 'ảnh'}.` },
         { status: 400 }
       );
     }
