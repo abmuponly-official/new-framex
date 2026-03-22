@@ -11,16 +11,21 @@ interface Props {
 
 export default function PdfUploadButton({ currentUrl, onUploaded }: Props) {
   const inputRef = useRef<HTMLInputElement>(null);
-  const [status, setStatus] = useState<'idle' | 'uploading' | 'done' | 'error'>('idle');
+  const [status, setStatus]   = useState<'idle' | 'uploading' | 'done' | 'error'>('idle');
   const [errorMsg, setErrorMsg] = useState('');
 
   async function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    if (file.type !== 'application/pdf') {
+    // Client-side guard (belt + suspenders alongside server validation)
+    const isPdf =
+      file.type === 'application/pdf' ||
+      file.name.toLowerCase().endsWith('.pdf');
+
+    if (!isPdf) {
       setStatus('error');
-      setErrorMsg('Chỉ chấp nhận file PDF.');
+      setErrorMsg(`Chỉ chấp nhận file PDF. File bạn chọn: "${file.name}" (${file.type || 'unknown type'})`);
       return;
     }
 
@@ -30,55 +35,56 @@ export default function PdfUploadButton({ currentUrl, onUploaded }: Props) {
     try {
       const fd = new FormData();
       fd.append('file', file);
-      fd.append('folder', 'settings');
+      fd.append('folder', 'brochures'); // dedicated folder in framex-media bucket
 
-      const res = await fetch('/api/admin/upload', { method: 'POST', body: fd });
-      const json = await res.json();
+      // ── Use the dedicated PDF endpoint (not the shared image endpoint) ──
+      const res  = await fetch('/api/admin/upload/pdf', { method: 'POST', body: fd });
+      const json = await res.json() as { url?: string; error?: string };
 
       if (!res.ok) {
         setStatus('error');
-        setErrorMsg(json.error ?? 'Upload thất bại.');
+        setErrorMsg(json.error ?? 'Upload thất bại, vui lòng thử lại.');
         return;
       }
 
-      onUploaded(json.url as string);
+      onUploaded(json.url!);
       setStatus('done');
     } catch {
       setStatus('error');
-      setErrorMsg('Lỗi kết nối, vui lòng thử lại.');
+      setErrorMsg('Lỗi kết nối tới server, vui lòng thử lại.');
     } finally {
-      // reset input so user can upload the same file again if needed
+      // Reset so same file can be re-uploaded if needed
       if (inputRef.current) inputRef.current.value = '';
     }
   }
 
   return (
     <div style={{ marginTop: 8 }}>
-      {/* Hidden native file input */}
+      {/* Hidden native file input — only accepts PDF */}
       <input
         ref={inputRef}
         type="file"
-        accept="application/pdf"
+        accept=".pdf,application/pdf"
         style={{ display: 'none' }}
         onChange={handleFileChange}
       />
 
-      {/* Upload button */}
+      {/* Upload trigger button */}
       <button
         type="button"
         className="btn btn-secondary"
         style={{ fontSize: 13, padding: '6px 14px' }}
         disabled={status === 'uploading'}
-        onClick={() => inputRef.current?.click()}
+        onClick={() => {
+          setStatus('idle');
+          setErrorMsg('');
+          inputRef.current?.click();
+        }}
       >
-        {status === 'uploading' ? (
-          <>⏳ Đang tải lên…</>
-        ) : (
-          <>📎 Tải lên file PDF mới</>
-        )}
+        {status === 'uploading' ? '⏳ Đang tải lên…' : '📎 Tải lên file PDF mới'}
       </button>
 
-      {/* Current file preview */}
+      {/* Preview current file */}
       {currentUrl && (
         <a
           href={currentUrl}
@@ -98,12 +104,14 @@ export default function PdfUploadButton({ currentUrl, onUploaded }: Props) {
         </a>
       )}
 
-      {/* Status messages */}
+      {/* Success */}
       {status === 'done' && (
         <p style={{ marginTop: 6, fontSize: 12, color: '#16a34a' }}>
-          ✅ Upload thành công! URL đã được cập nhật — nhấn "Lưu tất cả cài đặt" để lưu.
+          ✅ Upload thành công! URL đã được điền — nhấn &ldquo;Lưu tất cả cài đặt&rdquo; để lưu vào database.
         </p>
       )}
+
+      {/* Error */}
       {status === 'error' && (
         <p style={{ marginTop: 6, fontSize: 12, color: '#dc2626' }}>❌ {errorMsg}</p>
       )}
