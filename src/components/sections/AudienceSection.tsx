@@ -26,7 +26,7 @@ export default async function AudienceSection({ locale }: Props) {
       role: t('audience_3_role'),
       copy: t('audience_3_copy'),
       cta:  t('audience_3_cta'),
-      href: `/${locale}/chu-dau-tu`,
+      href: `/${locale}/nha-thau`,   // Developer/Chủ đầu tư → project-control persona page
       num:  '03',
     },
   ];
