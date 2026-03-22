@@ -308,3 +308,86 @@ body {
     margin: 0;
   }
 }
+
+/* ─────────────────────────────────────────────────────────────────────────────
+ * ACCESSIBILITY — prefers-reduced-motion
+ * When a user has enabled "Reduce Motion" in their OS/browser settings,
+ * we cut all decorative motion while keeping full layout and readability.
+ *
+ * Coverage:
+ *  1. .reveal — skip opacity/transform transition, jump straight to in-view state
+ *  2. Hero section keyframe animations (hFadeUp, hFadeUpSm, hFadeIn, hMarkIn)
+ *  3. Scroll pulse line (hScrollPulse infinite loop)
+ *  4. GuidedQuestion custom reveal classes
+ *  5. PainSection card reveal
+ *  6. Hover micro-transitions on cards, buttons, links — reduced to 0.01s
+ *     (not 'none' — avoids focus/hover layout jumps but is effectively instant)
+ *  7. Bridge parallax is handled in JS (BridgeParallax.tsx checks matchMedia)
+ *
+ * Rule: DO NOT change layout, colour, or content — only motion.
+ * ───────────────────────────────────────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+
+  /* ── 1. Scroll reveal — jump immediately to visible state ── */
+  .reveal,
+  .reveal.in-view {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+    animation: none !important;
+  }
+
+  /* ── 2+3. Hero keyframe animations — all named animations → none ── */
+  *[style*="animation"] {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+
+  /* ── 4. GuidedQuestion custom reveal classes ── */
+  .guided-q-reveal,
+  .guided-q-reveal.in-view {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+
+  .guided-card-reveal,
+  .guided-card-reveal.in-view {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+
+  /* ── 5. Pain card reveal ── */
+  .pain-card-reveal,
+  .pain-card-reveal.in-view {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+
+  /* ── 6. Hover micro-transitions — effectively instant but not 'none' ── */
+  .btn-primary,
+  .btn-outline-white,
+  .btn-outline-dark,
+  .card-dark,
+  .card-light,
+  .guided-choice,
+  .guided-arrow,
+  .pain-card,
+  a,
+  button {
+    transition-duration: 0.01s !important;
+    animation: none !important;
+  }
+
+  /* ── 7. Bridge parallax background ── */
+  /* JS-level guard in BridgeParallax.tsx handles this;
+     this CSS rule is a belt-and-suspenders fallback. */
+  .bridge-bg {
+    transform: none !important;
+    will-change: auto !important;
+    transition: none !important;
+  }
+}

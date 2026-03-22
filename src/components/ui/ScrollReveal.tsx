@@ -7,33 +7,44 @@ import { useEffect } from 'react';
  * and adds `.in-view` when it enters the viewport.
  * Placed once in the locale layout so it runs on every page.
  *
- * Tuned for meditative cadence:
- *  — threshold 0.08 (reveal begins when 8% visible, earlier trigger)
- *  — rootMargin -40px bottom (slight buffer so reveal isn't instant at edge)
- *  — Handles both initial elements and any added after mount (e.g. CMS content)
+ * Accessibility:
+ *  — If prefers-reduced-motion is active, ALL .reveal elements are marked
+ *    .in-view immediately on mount (no observer, no scroll dependency).
+ *    The CSS in globals.css also sets transition:none, so elements simply
+ *    appear at full opacity with no animation whatsoever.
+ *
+ * Normal cadence:
+ *  — threshold 0.08 — reveal begins when 8% of element is visible
+ *  — rootMargin -40px bottom — soft buffer for breathing feel
+ *  — animate once (unobserve after .in-view)
  */
 export default function ScrollReveal() {
   useEffect(() => {
-    const observe = (elements: NodeListOf<HTMLElement>) => {
-      const observer = new IntersectionObserver(
-        (entries) => {
-          entries.forEach((entry) => {
-            if (entry.isIntersecting) {
-              entry.target.classList.add('in-view');
-              observer.unobserve(entry.target); // animate once
-            }
-          });
-        },
-        { threshold: 0.08, rootMargin: '0px 0px -40px 0px' }
-      );
-      elements.forEach((el) => observer.observe(el));
-      return observer;
-    };
+    const elements = document.querySelectorAll<HTMLElement>('.reveal');
 
-    const initial = document.querySelectorAll<HTMLElement>('.reveal');
-    const obs = observe(initial);
+    /* ── Reduced motion: skip observer, mark everything visible now ── */
+    const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (prefersReduced) {
+      elements.forEach((el) => el.classList.add('in-view'));
+      return;
+    }
 
-    return () => obs.disconnect();
+    /* ── Normal path: IntersectionObserver ── */
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('in-view');
+            observer.unobserve(entry.target); // animate once
+          }
+        });
+      },
+      { threshold: 0.08, rootMargin: '0px 0px -40px 0px' }
+    );
+
+    elements.forEach((el) => observer.observe(el));
+
+    return () => observer.disconnect();
   }, []);
 
   return null;

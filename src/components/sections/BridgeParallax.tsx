@@ -3,11 +3,22 @@
 import { useEffect, useRef } from 'react';
 
 /*
- * BridgeParallax — client component that applies a very subtle
- * parallax translateY to the bridge section's background image.
- * Travel: max ±18px. Feels like the image breathes rather than moves.
- * Uses requestAnimationFrame for smooth 60fps, passive scroll listener.
+ * BridgeParallax — subtle background image parallax for BridgeSection.
+ *
+ * Safety constraints:
+ *  — Travel clamped to ±14px (inset is -24px, so 10px hard safety margin
+ *    even at iOS Safari elastic overscroll extremes)
+ *  — Respects prefers-reduced-motion: skip all transforms when user
+ *    has requested reduced motion (accessibility requirement)
+ *  — will-change-transform applied only during active scroll via
+ *    .is-scrolling class, removed after 120ms idle — avoids holding
+ *    a GPU compositing layer open on low-RAM devices when not in use
+ *  — passive scroll listener, rAF-batched, cleanup on unmount
  */
+
+const MAX_TRAVEL = 14;   // px — never exceeds inset (-24px), safe on iOS
+const IDLE_DELAY = 120;  // ms before will-change is released after scroll stops
+
 export default function BridgeParallax() {
   const bgRef = useRef<HTMLDivElement>(null);
 
@@ -15,47 +26,85 @@ export default function BridgeParallax() {
     const el = bgRef.current;
     if (!el) return;
 
+    /* ── Respect prefers-reduced-motion ── */
+    const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
+    if (mq.matches) {
+      // No parallax — clear any transform and exit immediately
+      el.style.transform = 'translateY(0)';
+      return;
+    }
+
     let rafId: number;
+    let idleTimer: ReturnType<typeof setTimeout>;
 
     const onScroll = () => {
+      /* Activate compositing layer only while scrolling */
+      el.classList.add('is-scrolling');
+      clearTimeout(idleTimer);
+      idleTimer = setTimeout(() => el.classList.remove('is-scrolling'), IDLE_DELAY);
+
+      cancelAnimationFrame(rafId);
       rafId = requestAnimationFrame(() => {
         if (!el) return;
         const section = el.closest('section');
         if (!section) return;
-        const rect = section.getBoundingClientRect();
-        const vh = window.innerHeight;
-        // progress: -1 (section above viewport) → 0 (centred) → +1 (below)
-        const progress = (vh / 2 - (rect.top + rect.height / 2)) / vh;
-        // max ±18px travel, very slow
-        const y = progress * 18;
+
+        const rect   = section.getBoundingClientRect();
+        const vh     = window.innerHeight;
+
+        /*
+         * progress: 0 when section is centred in viewport.
+         * Range is ≈ [-0.5, +0.5] normally; iOS elastic scroll can push
+         * it a bit beyond that — clamped below.
+         */
+        const raw      = (vh / 2 - (rect.top + rect.height / 2)) / vh;
+        const progress = Math.max(-1, Math.min(1, raw)); // hard clamp before multiply
+        const y        = Math.max(-MAX_TRAVEL, Math.min(MAX_TRAVEL, progress * MAX_TRAVEL));
+
         el.style.transform = `translateY(${y.toFixed(2)}px)`;
       });
     };
 
     window.addEventListener('scroll', onScroll, { passive: true });
-    onScroll(); // set initial position
+    onScroll(); // set initial position on mount
 
     return () => {
       window.removeEventListener('scroll', onScroll);
       cancelAnimationFrame(rafId);
+      clearTimeout(idleTimer);
+      el.classList.remove('is-scrolling');
     };
   }, []);
 
   return (
-    <div
-      ref={bgRef}
-      className="absolute inset-0 will-change-transform"
-      aria-hidden="true"
-      style={{
-        backgroundImage:
-          'url(https://images.pexels.com/photos/4067521/pexels-photo-4067521.jpeg?auto=compress&cs=tinysrgb&w=1600)',
-        backgroundSize: 'cover',
-        backgroundPosition: 'center 40%',
-        backgroundRepeat: 'no-repeat',
-        /* scale slightly so parallax travel never reveals edges */
-        transform: 'translateY(0)',
-        inset: '-24px',
-      }}
-    />
+    <>
+      {/*
+       * .is-scrolling activates will-change only when needed.
+       * Defined here as a scoped <style> so it doesn't pollute globals.
+       */}
+      <style>{`
+        .bridge-bg.is-scrolling { will-change: transform; }
+        .bridge-bg              { will-change: auto; }
+      `}</style>
+
+      <div
+        ref={bgRef}
+        className="bridge-bg absolute"
+        aria-hidden="true"
+        style={{
+          /*
+           * inset: -24px gives 24px bleed on all sides.
+           * MAX_TRAVEL (14px) + safety buffer (10px) = 24px → no edge exposure.
+           */
+          inset: '-24px',
+          backgroundImage:
+            'url(https://images.pexels.com/photos/4067521/pexels-photo-4067521.jpeg?auto=compress&cs=tinysrgb&w=1600)',
+          backgroundSize: 'cover',
+          backgroundPosition: 'center 40%',
+          backgroundRepeat: 'no-repeat',
+          transform: 'translateY(0)',
+        }}
+      />
+    </>
   );
 }
