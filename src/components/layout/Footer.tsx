@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { getTranslations } from 'next-intl/server';
 import type { Locale } from '@/lib/i18n/request';
+import { getSiteSettings, getSetting } from '@/lib/supabase/settings';
 
 type Props = { locale: Locale };
 
@@ -8,6 +9,13 @@ export default async function Footer({ locale }: Props) {
   const t = await getTranslations({ locale, namespace: 'footer' });
   const nav = await getTranslations({ locale, namespace: 'nav' });
   const year = new Date().getFullYear();
+
+  // ── Fetch contact info from CMS (cached 60 s, busted on admin save) ─────────
+  const settings = await getSiteSettings();
+  const email   = getSetting(settings, 'contact_email',  locale);
+  const phone   = getSetting(settings, 'contact_phone',  locale);
+  const address = getSetting(settings, 'address',        locale);
+  const pdfPath = getSetting(settings, 'capability_pdf', locale);
 
   const p = (path: string) => `/${locale}${path}`;
 
@@ -74,31 +82,40 @@ export default async function Footer({ locale }: Props) {
             </ul>
           </div>
 
-          {/* Col 4 — Contact */}
+          {/* Col 4 — Contact (from CMS) */}
           <div>
             <p className="text-brand-gray-400 text-xs uppercase tracking-widest mb-4 font-medium">
               {t('contact_title')}
             </p>
             <address className="not-italic flex flex-col gap-2.5 text-sm text-brand-gray-300">
-              <a href="mailto:hello@framex.vn" className="hover:text-brand-white transition-colors">
-                hello@framex.vn
-              </a>
-              <a href="tel:+84" className="hover:text-brand-white transition-colors">
-                +84 xxx xxx xxx
-              </a>
-              <span>TP. Hồ Chí Minh, Việt Nam</span>
+              {email && (
+                <a href={`mailto:${email}`} className="hover:text-brand-white transition-colors">
+                  {email}
+                </a>
+              )}
+              {phone && (
+                <a
+                  href={`tel:${phone.replace(/\s/g, '')}`}
+                  className="hover:text-brand-white transition-colors"
+                >
+                  {phone}
+                </a>
+              )}
+              {address && <span>{address}</span>}
             </address>
 
             {/* Capability PDF download */}
-            <a
-              href="/files/framex-capability.pdf"
-              download
-              className="inline-flex items-center gap-2 mt-6 text-xs text-brand-accent
-                border border-brand-accent/40 rounded-sm px-3 py-2
-                hover:bg-brand-accent/10 transition-colors"
-            >
-              ↓ {t('capability')}
-            </a>
+            {pdfPath && (
+              <a
+                href={pdfPath}
+                download
+                className="inline-flex items-center gap-2 mt-6 text-xs text-brand-accent
+                  border border-brand-accent/40 rounded-sm px-3 py-2
+                  hover:bg-brand-accent/10 transition-colors"
+              >
+                ↓ {t('capability')}
+              </a>
+            )}
           </div>
         </div>
 

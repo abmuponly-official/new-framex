@@ -2,6 +2,7 @@ import { getTranslations, setRequestLocale } from 'next-intl/server';
 import type { Metadata } from 'next';
 import type { Locale } from '@/lib/i18n/request';
 import ContactForm from '@/components/sections/ContactForm';
+import { getSiteSettings, getSetting } from '@/lib/supabase/settings';
 
 type Props = { params: { locale: string } };
 
@@ -16,6 +17,13 @@ export default async function ContactPage({ params }: Props) {
   const locale = params.locale as Locale;
   setRequestLocale(locale);
   const t = await getTranslations({ locale, namespace: 'contact' });
+
+  // ── Fetch contact info from CMS (cached 60 s) ──────────────────────────────
+  const settings = await getSiteSettings();
+  const email       = getSetting(settings, 'contact_email',  locale);
+  const phone       = getSetting(settings, 'contact_phone',  locale);
+  const address     = getSetting(settings, 'address',        locale);
+  const pdfPath     = getSetting(settings, 'capability_pdf', locale);
 
   return (
     <>
@@ -32,16 +40,31 @@ export default async function ContactPage({ params }: Props) {
             {/* Contact form */}
             <ContactForm locale={locale} />
 
-            {/* Contact info */}
+            {/* Contact info — driven by CMS */}
             <div className="space-y-8">
               <div>
                 <p className="text-xs uppercase tracking-widest text-brand-gray-400 mb-4 font-medium">
                   {locale === 'vi' ? 'Liên hệ trực tiếp' : 'Direct contact'}
                 </p>
                 <address className="not-italic space-y-3 text-brand-gray-600">
-                  <p><a href="mailto:hello@framex.vn" className="hover:text-brand-black transition-colors">hello@framex.vn</a></p>
-                  <p><a href="tel:+84" className="hover:text-brand-black transition-colors">+84 xxx xxx xxx</a></p>
-                  <p>TP. Hồ Chí Minh, Việt Nam</p>
+                  {email && (
+                    <p>
+                      <a href={`mailto:${email}`} className="hover:text-brand-black transition-colors">
+                        {email}
+                      </a>
+                    </p>
+                  )}
+                  {phone && (
+                    <p>
+                      <a
+                        href={`tel:${phone.replace(/\s/g, '')}`}
+                        className="hover:text-brand-black transition-colors"
+                      >
+                        {phone}
+                      </a>
+                    </p>
+                  )}
+                  {address && <p>{address}</p>}
                 </address>
               </div>
 
@@ -56,20 +79,22 @@ export default async function ContactPage({ params }: Props) {
                 </p>
               </div>
 
-              <div>
-                <p className="text-xs uppercase tracking-widest text-brand-gray-400 mb-4 font-medium">
-                  {locale === 'vi' ? 'Tải hồ sơ năng lực' : 'Capability profile'}
-                </p>
-                <a
-                  href="/files/framex-capability.pdf"
-                  download
-                  className="inline-flex items-center gap-2 text-sm text-brand-black
-                    border border-brand-gray-200 rounded-sm px-4 py-2.5
-                    hover:bg-brand-gray-50 transition-colors"
-                >
-                  ↓ {locale === 'vi' ? 'Tải PDF' : 'Download PDF'}
-                </a>
-              </div>
+              {pdfPath && (
+                <div>
+                  <p className="text-xs uppercase tracking-widest text-brand-gray-400 mb-4 font-medium">
+                    {locale === 'vi' ? 'Tải hồ sơ năng lực' : 'Capability profile'}
+                  </p>
+                  <a
+                    href={pdfPath}
+                    download
+                    className="inline-flex items-center gap-2 text-sm text-brand-black
+                      border border-brand-gray-200 rounded-sm px-4 py-2.5
+                      hover:bg-brand-gray-50 transition-colors"
+                  >
+                    ↓ {locale === 'vi' ? 'Tải PDF' : 'Download PDF'}
+                  </a>
+                </div>
+              )}
             </div>
           </div>
         </div>
