@@ -4,7 +4,13 @@ const createNextIntlPlugin = require('next-intl/plugin');
 const withNextIntl = createNextIntlPlugin('./src/lib/i18n/request.ts');
 
 const nextConfig = {
+  // Required for @cloudflare/next-on-pages
+  experimental: {
+    runtime: 'edge',
+  },
   images: {
+    // Use unoptimized for Cloudflare Pages (no image optimization server)
+    unoptimized: true,
     remotePatterns: [
       {
         protocol: 'https',
