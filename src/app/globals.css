@@ -1,0 +1,118 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ─── CSS Custom Properties (Brand Tokens) ──────────────────────────────────── */
+:root {
+  --color-black:   #0F0F0F;
+  --color-white:   #F9F8F6;
+  --color-accent:  #C8A96A;
+  --color-steel:   #4A6FA5;
+
+  --font-sans: 'Be Vietnam Pro', 'Inter', system-ui, -apple-system, sans-serif;
+
+  --spacing-section: 6rem;
+  --max-width: 1200px;
+}
+
+/* ─── Base Reset ──────────────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; }
+
+html {
+  scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  background-color: var(--color-white);
+  color: var(--color-black);
+  font-family: var(--font-sans);
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+/* ─── Selection ──────────────────────────────────────────────────────────── */
+::selection {
+  background-color: #0F0F0F;
+  color: #F9F8F6;
+}
+
+/* ─── Scrollbar ──────────────────────────────────────────────────────────── */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+  background: #B0ADAB;
+  border-radius: 3px;
+}
+
+/* ─── Utility Classes ─────────────────────────────────────────────────────── */
+@layer utilities {
+  .container-base {
+    max-width: var(--max-width);
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+  }
+
+  .section-padding {
+    padding-top: var(--spacing-section);
+    padding-bottom: var(--spacing-section);
+  }
+
+  .text-balance { text-wrap: balance; }
+
+  /* Animate on scroll — add via JS intersection observer */
+  .animate-on-scroll {
+    opacity: 0;
+    transform: translateY(24px);
+    transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+  }
+  .animate-on-scroll.in-view {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ─── Typography ──────────────────────────────────────────────────────────── */
+@layer base {
+  h1, h2, h3, h4, h5, h6 {
+    font-weight: 600;
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+    text-wrap: balance;
+  }
+
+  p { max-width: 65ch; }
+
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  img, video { max-width: 100%; height: auto; }
+
+  /* Prose content (blog, case studies) */
+  .prose-framex {
+    @apply text-brand-gray-700 leading-relaxed;
+  }
+  .prose-framex h2 {
+    @apply text-brand-black text-2xl font-semibold mt-12 mb-4;
+  }
+  .prose-framex h3 {
+    @apply text-brand-black text-xl font-medium mt-8 mb-3;
+  }
+  .prose-framex p {
+    @apply mb-5;
+  }
+  .prose-framex ul {
+    @apply list-disc pl-6 mb-5 space-y-2;
+  }
+  .prose-framex strong {
+    @apply text-brand-black font-semibold;
+  }
+  .prose-framex blockquote {
+    @apply border-l-4 border-brand-accent pl-6 italic text-brand-gray-600 my-8;
+  }
+}
