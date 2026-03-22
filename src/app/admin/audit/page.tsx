@@ -16,21 +16,38 @@ export default async function AdminAuditPage({
   if (!user) redirect('/admin/login');
 
   const admin = createAdminClient();
-  const page = parseInt(searchParams.page ?? '1', 10);
+  const page = Math.max(1, parseInt(searchParams.page ?? '1', 10));
   const perPage = 20;
   const from = (page - 1) * perPage;
   const table = searchParams.table;
 
-  // Note: do NOT join user_id — it can be NULL (public contact form triggers)
-  // which causes PostgREST FK join to throw a server error
-  let query = admin
-    .from('audit_log')
-    .select('id, action, table_name, record_id, new_values, user_id, created_at', { count: 'exact' });
-  if (table && table !== 'all') query = query.eq('table_name', table);
-  query = query.order('created_at', { ascending: false }).range(from, from + perPage - 1);
+  // Graceful: audit_log may not exist yet in production DB
+  let logs: AuditLog[] | null = null;
+  let count: number | null = 0;
+  let auditUnavailable = false;
 
-  const { data: logs, count, error: auditError } = await query;
-  if (auditError) console.error('[audit] query error:', auditError.message);
+  try {
+    // Note: do NOT join user_id — it can be NULL (public contact form)
+    // which causes PostgREST FK join to throw a server error
+    let query = admin
+      .from('audit_log')
+      .select('id, action, table_name, record_id, new_values, user_id, created_at', { count: 'exact' });
+    if (table && table !== 'all') query = query.eq('table_name', table);
+    query = query.order('created_at', { ascending: false }).range(from, from + perPage - 1);
+
+    const { data, count: cnt, error } = await query;
+    if (error) {
+      console.error('[audit] query error:', error.message);
+      auditUnavailable = true;
+    } else {
+      logs = data;
+      count = cnt;
+    }
+  } catch (e) {
+    console.error('[audit] unexpected error:', e);
+    auditUnavailable = true;
+  }
+
   const totalPages = Math.ceil((count ?? 0) / perPage);
 
   return (
@@ -41,6 +58,12 @@ export default async function AdminAuditPage({
           Lịch sử tất cả thay đổi dữ liệu — {count ?? 0} bản ghi
         </p>
       </div>
+
+      {auditUnavailable && (
+        <div className="alert alert-error" style={{ marginBottom: 24 }}>
+          ⚠️ Bảng <code>audit_log</code> chưa được tạo trong database. Hãy chạy migration SQL để kích hoạt tính năng này.
+        </div>
+      )}
 
       {/* Filter */}
       <div className="admin-card" style={{ marginBottom: 24, padding: 16 }}>
@@ -86,7 +109,7 @@ export default async function AdminAuditPage({
                   </td>
                   <td style={{ fontFamily: 'monospace', fontSize: 13 }}>{log.table_name}</td>
                   <td style={{ fontFamily: 'monospace', fontSize: 11, color: '#9ca3af' }}>
-                    {log.record_id?.slice(0, 8)}…
+                    {log.record_id ? log.record_id.slice(0, 8) + '…' : '—'}
                   </td>
                   <td style={{ fontSize: 13, color: '#9ca3af' }}>
                     {log.user_id ? log.user_id.slice(0, 8) + '…' : 'Public'}
@@ -109,7 +132,7 @@ export default async function AdminAuditPage({
               )) : (
                 <tr>
                   <td colSpan={6} style={{ textAlign: 'center', padding: 40, color: '#9ca3af' }}>
-                    Chưa có nhật ký nào.
+                    {auditUnavailable ? 'Tính năng chưa sẵn sàng — chạy migration SQL trước.' : 'Chưa có nhật ký nào.'}
                   </td>
                 </tr>
               )}

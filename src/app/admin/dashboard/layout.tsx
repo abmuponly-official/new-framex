@@ -1,7 +1,11 @@
 import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
-import AdminShell from '@/components/admin/AdminShell';
 
+/**
+ * Auth guard for /admin/dashboard routes.
+ * Does NOT wrap in AdminShell — each page handles its own AdminShell
+ * to avoid double-nesting (layout AdminShell → page AdminShell).
+ */
 export default async function AdminDashboardLayout({
   children,
 }: {
@@ -16,5 +20,6 @@ export default async function AdminDashboardLayout({
     redirect('/admin/login');
   }
 
-  return <AdminShell user={user}>{children}</AdminShell>;
+  // Pass through — AdminShell is rendered by the child page itself
+  return <>{children}</>;
 }

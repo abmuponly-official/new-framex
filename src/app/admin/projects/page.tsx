@@ -2,6 +2,7 @@ import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import AdminShell from '@/components/admin/AdminShell';
+import DeleteProjectButton from '@/components/admin/DeleteProjectButton';
 import Link from 'next/link';
 import type { Project } from '@/types/content';
 
@@ -101,7 +102,7 @@ export default async function AdminProjectsPage({
                       <div className="actions">
                         <Link href={`/admin/projects/${p.id}/edit`} className="btn btn-secondary btn-sm">Sửa</Link>
                         <Link href={`/vi/du-an/${p.slug}`} target="_blank" className="btn btn-secondary btn-sm">Xem</Link>
-                        <DeleteProjectButton id={p.id} title={p.title_vi} />
+                        <DeleteProjectButton id={p.id} title={p.title_vi ?? 'dự án này'} />
                       </div>
                     </td>
                   </tr>
@@ -137,20 +138,7 @@ export default async function AdminProjectsPage({
   );
 }
 
-// Client-side delete button lives in its own file — we use a form action here for simplicity
-function DeleteProjectButton({ id, title }: { id: string; title: string }) {
-  return (
-    <form
-      action={`/api/admin/projects/${id}/delete`}
-      method="POST"
-      onSubmit={(e) => {
-        if (!confirm(`Xoá dự án "${title}"? Hành động này không thể hoàn tác.`)) e.preventDefault();
-      }}
-    >
-      <button type="submit" className="btn btn-danger btn-sm">Xoá</button>
-    </form>
-  );
-}
+
 
 function formatDate(d: string) {
   if (!d) return '—';

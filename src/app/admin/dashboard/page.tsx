@@ -27,11 +27,18 @@ export default async function AdminDashboardPage() {
     admin.from('leads').select('*', { count: 'exact', head: true }).eq('status', 'new'),
   ]);
 
-  const { data: recentLeads } = await admin
-    .from('leads')
-    .select('id, name, phone, role, status, created_at')
-    .order('created_at', { ascending: false })
-    .limit(5);
+  // Graceful: query only safe columns (notes may not exist if migration not run)
+  let recentLeads: Array<{ id: string; name: string; phone: string | null; role: string | null; status: string; created_at: string }> | null = null;
+  try {
+    const { data } = await admin
+      .from('leads')
+      .select('id, name, phone, role, status, created_at')
+      .order('created_at', { ascending: false })
+      .limit(5);
+    recentLeads = data;
+  } catch {
+    recentLeads = null;
+  }
 
   // audit_log: graceful fallback — table may have RLS or join issues
   let recentAudit: Array<{ id: string; action: string; table_name: string; created_at: string }> | null = null;
