@@ -5,19 +5,16 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "build:cf": "npx @cloudflare/next-on-pages",
     "start": "next start -p 3000",
     "lint": "next lint",
-    "type-check": "tsc --noEmit",
-    "deploy": "npx @cloudflare/next-on-pages && wrangler pages deploy .vercel/output/static --project-name new-framex",
-    "deploy:prod": "npx @cloudflare/next-on-pages && wrangler pages deploy .vercel/output/static --project-name new-framex --branch main"
+    "type-check": "tsc --noEmit"
   },
   "dependencies": {
     "@supabase/ssr": "^0.5.2",
     "@supabase/supabase-js": "^2.49.4",
     "clsx": "^2.1.1",
     "lucide-react": "^0.511.0",
-    "next": "15.4.11",
+    "next": "14.2.29",
     "next-intl": "^3.26.5",
     "react": "^18.3.1",
     "react-dom": "^18.3.1"
