@@ -5,6 +5,7 @@ import type { Metadata } from 'next';
 import { locales, type Locale } from '@/lib/i18n/request';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
+import ScrollReveal from '@/components/ui/ScrollReveal';
 
 type Props = {
   children: React.ReactNode;
@@ -64,16 +65,19 @@ export default async function LocaleLayout({ children, params }: Props) {
           href="https://fonts.gstatic.com"
           crossOrigin="anonymous"
         />
+        {/* Montserrat — display headings (per FrameX Brand Bible) */}
+        {/* Inter — body copy (clean, modern) */}
         <link
-          href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700&display=swap"
+          href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600&display=swap"
           rel="stylesheet"
         />
       </head>
-      <body className="bg-brand-white text-brand-black font-sans antialiased">
+      <body className="bg-brand-white text-brand-black font-sans antialiased" style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>
         <NextIntlClientProvider messages={messages}>
           <Header locale={locale} />
           <main id="main-content">{children}</main>
           <Footer locale={locale} />
+          <ScrollReveal />
         </NextIntlClientProvider>
       </body>
     </html>

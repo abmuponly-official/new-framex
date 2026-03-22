@@ -12,6 +12,20 @@ type Props = {
   locale: Locale;
 };
 
+/** FrameX wordmark — FRAME in charcoal, X in brand orange */
+function FrameXLogo({ dark = false }: { dark?: boolean }) {
+  return (
+    <span
+      className="font-bold tracking-[0.06em] uppercase select-none"
+      style={{ fontFamily: 'Montserrat, sans-serif', fontSize: '1.125rem' }}
+      aria-label="FrameX"
+    >
+      <span style={{ color: dark ? '#2C2C2C' : '#FFFFFF' }}>FRAME</span>
+      <span style={{ color: '#FF6B35' }}>X</span>
+    </span>
+  );
+}
+
 export default function Header({ locale }: Props) {
   const t = useTranslations('nav');
   const pathname = usePathname();
@@ -21,8 +35,9 @@ export default function Header({ locale }: Props) {
 
   useEffect(() => {
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 20);
-      setIsHeroZone(window.scrollY < window.innerHeight * 0.8);
+      const y = window.scrollY;
+      setIsScrolled(y > 20);
+      setIsHeroZone(y < window.innerHeight * 0.75);
     };
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
@@ -41,6 +56,9 @@ export default function Header({ locale }: Props) {
 
   const isActive = (href: string) => pathname === href;
 
+  /* Header is transparent+hidden in hero zone; appears on scroll */
+  const headerVisible = isScrolled || !isHeroZone;
+
   return (
     <>
       <header
@@ -48,57 +66,92 @@ export default function Header({ locale }: Props) {
           fixed top-0 left-0 right-0 z-50
           transition-all duration-500
           ${isScrolled
-            ? 'bg-brand-white/95 backdrop-blur-sm border-b border-brand-gray-100 shadow-sm'
-            : 'bg-transparent'}
-          ${isHeroZone && !isScrolled ? 'opacity-0 pointer-events-none' : 'opacity-100 pointer-events-auto'}
+            ? 'border-b shadow-sm'
+            : 'border-b border-transparent'}
         `}
+        style={{
+          background: isScrolled
+            ? 'rgba(249,248,246,0.97)'
+            : 'transparent',
+          borderBottomColor: isScrolled ? '#EBEBEB' : 'transparent',
+          backdropFilter: isScrolled ? 'blur(12px)' : 'none',
+          opacity: headerVisible ? 1 : 0,
+          pointerEvents: headerVisible ? 'auto' : 'none',
+          transform: headerVisible ? 'translateY(0)' : 'translateY(-4px)',
+          transition: 'opacity 0.4s ease, transform 0.4s ease, background 0.4s ease, border-color 0.4s ease, backdrop-filter 0.4s ease',
+        }}
       >
         <div className="container-base">
-          <div className="flex items-center justify-between h-16 md:h-18">
-            {/* Logo */}
-            <Link
-              href={`/${locale}`}
-              className="font-semibold text-lg tracking-tight text-brand-black hover:opacity-70 transition-opacity"
-            >
-              FrameX
+          <div className="flex items-center justify-between h-16 md:h-[4.5rem]">
+
+            {/* ── Logo ── */}
+            <Link href={`/${locale}`} aria-label="FrameX home">
+              <FrameXLogo dark={isScrolled} />
             </Link>
 
-            {/* Desktop nav */}
-            <nav className="hidden lg:flex items-center gap-6" aria-label="Main navigation">
+            {/* ── Desktop nav ── */}
+            <nav className="hidden lg:flex items-center gap-7" aria-label="Main navigation">
               {navLinks.map((link) => (
                 <Link
                   key={link.href}
                   href={link.href}
-                  className={`
-                    text-sm font-medium transition-colors
-                    ${isActive(link.href)
-                      ? 'text-brand-black'
-                      : 'text-brand-gray-500 hover:text-brand-black'}
-                  `}
+                  className="text-sm font-medium transition-colors duration-200 relative group"
+                  style={{
+                    fontFamily: 'Inter, sans-serif',
+                    color: isActive(link.href)
+                      ? '#2C2C2C'
+                      : isScrolled ? '#6B6B6B' : 'rgba(255,255,255,0.65)',
+                    letterSpacing: '0.01em',
+                  }}
                 >
                   {link.label}
+                  {/* Active underline */}
+                  {isActive(link.href) && (
+                    <span
+                      className="absolute -bottom-1 left-0 right-0 h-px"
+                      style={{ background: '#FF6B35' }}
+                      aria-hidden="true"
+                    />
+                  )}
                 </Link>
               ))}
             </nav>
 
-            {/* Right side */}
+            {/* ── Right: lang switcher + CTA ── */}
             <div className="flex items-center gap-3">
               <LanguageSwitcher locale={locale} />
 
-              {/* Desktop CTA */}
+              {/* CTA button — primary orange */}
               <Link
                 href={p('/lien-he')}
-                className="hidden md:inline-flex items-center px-4 py-2 text-sm font-medium
-                  bg-brand-black text-brand-white rounded-sm
-                  hover:bg-brand-gray-800 transition-colors"
+                className="hidden md:inline-flex items-center gap-1.5 text-xs font-semibold px-5 py-2.5 rounded-sm transition-all duration-200"
+                style={{
+                  fontFamily: 'Montserrat, sans-serif',
+                  letterSpacing: '0.08em',
+                  textTransform: 'uppercase',
+                  background: '#FF6B35',
+                  color: '#FFFFFF',
+                  border: '2px solid #FF6B35',
+                }}
+                onMouseEnter={(e) => {
+                  const el = e.currentTarget;
+                  el.style.background = 'transparent';
+                  el.style.color = isScrolled ? '#FF6B35' : '#FF6B35';
+                }}
+                onMouseLeave={(e) => {
+                  const el = e.currentTarget;
+                  el.style.background = '#FF6B35';
+                  el.style.color = '#FFFFFF';
+                }}
               >
                 {t('cta')}
               </Link>
 
-              {/* Mobile menu toggle */}
+              {/* Mobile toggle */}
               <button
                 onClick={() => setMobileOpen(!mobileOpen)}
-                className="lg:hidden p-2 text-brand-gray-600 hover:text-brand-black transition-colors"
+                className="lg:hidden p-2 transition-colors"
+                style={{ color: isScrolled ? '#4A4A4A' : 'rgba(255,255,255,0.7)' }}
                 aria-label="Toggle menu"
                 aria-expanded={mobileOpen}
               >
@@ -109,31 +162,47 @@ export default function Header({ locale }: Props) {
         </div>
       </header>
 
-      {/* Mobile menu overlay */}
+      {/* ── Mobile menu ── */}
       {mobileOpen && (
         <div
-          className="fixed inset-0 z-40 bg-brand-white pt-16"
+          className="fixed inset-0 z-40 pt-16 overflow-y-auto"
+          style={{ background: 'rgba(249,248,246,0.98)', backdropFilter: 'blur(16px)' }}
           onClick={() => setMobileOpen(false)}
         >
-          <nav className="container-base py-8 flex flex-col gap-1">
+          <nav className="container-base py-8 flex flex-col gap-1" onClick={(e) => e.stopPropagation()}>
             {navLinks.map((link) => (
               <Link
                 key={link.href}
                 href={link.href}
                 onClick={() => setMobileOpen(false)}
-                className={`
-                  py-3 text-lg font-medium border-b border-brand-gray-100
-                  ${isActive(link.href) ? 'text-brand-black' : 'text-brand-gray-600'}
-                `}
+                className="flex items-center justify-between py-4 border-b text-base font-medium"
+                style={{
+                  fontFamily: 'Inter, sans-serif',
+                  borderBottomColor: '#EBEBEB',
+                  color: isActive(link.href) ? '#2C2C2C' : '#6B6B6B',
+                }}
               >
                 {link.label}
+                {isActive(link.href) && (
+                  <span
+                    className="w-1.5 h-1.5 rounded-full"
+                    style={{ background: '#FF6B35' }}
+                    aria-hidden="true"
+                  />
+                )}
               </Link>
             ))}
             <Link
               href={p('/lien-he')}
               onClick={() => setMobileOpen(false)}
-              className="mt-6 py-3 px-6 text-center text-sm font-medium
-                bg-brand-black text-brand-white rounded-sm"
+              className="mt-6 py-3.5 text-center text-xs font-semibold rounded-sm"
+              style={{
+                fontFamily: 'Montserrat, sans-serif',
+                letterSpacing: '0.1em',
+                textTransform: 'uppercase',
+                background: '#FF6B35',
+                color: '#FFFFFF',
+              }}
             >
               {t('cta')}
             </Link>

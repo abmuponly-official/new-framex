@@ -38,9 +38,9 @@ export default async function SolutionPage({ params }: Props) {
       '@type': 'OfferCatalog',
       name: locale === 'vi' ? 'Gói giải pháp FrameX' : 'FrameX Solution Packages',
       itemListElement: [
-        { '@type': 'Offer', name: 'Basic', description: t('pkg_1_desc') },
+        { '@type': 'Offer', name: 'Basic',   description: t('pkg_1_desc') },
         { '@type': 'Offer', name: 'Premium', description: t('pkg_2_desc') },
-        { '@type': 'Offer', name: 'Custom', description: t('pkg_3_desc') },
+        { '@type': 'Offer', name: 'Custom',  description: t('pkg_3_desc') },
       ],
     },
   };
@@ -53,7 +53,7 @@ export default async function SolutionPage({ params }: Props) {
 
   const packages = [
     { name: t('pkg_1_name'), desc: t('pkg_1_desc'), highlight: false },
-    { name: t('pkg_2_name'), desc: t('pkg_2_desc'), highlight: true },
+    { name: t('pkg_2_name'), desc: t('pkg_2_desc'), highlight: true  },
     { name: t('pkg_3_name'), desc: t('pkg_3_desc'), highlight: false },
   ];
 
@@ -61,48 +61,95 @@ export default async function SolutionPage({ params }: Props) {
     <>
       <JsonLd data={serviceSchema} />
 
-      {/* Hero */}
-      <section className="pt-32 pb-20 bg-brand-black text-brand-white">
-        <div className="container-base max-w-3xl">
-          <p className="text-xs uppercase tracking-widest text-brand-gray-400 mb-4 font-medium">
-            {t('eyebrow')}
-          </p>
-          <h1 className="text-display-lg font-semibold text-brand-white mb-6">
+      {/* ── HERO ── */}
+      <section
+        className="pt-36 pb-24 relative overflow-hidden"
+        style={{ background: 'var(--gradient-hero)' }}
+      >
+        <div
+          className="absolute inset-0 opacity-[0.03] pointer-events-none"
+          style={{
+            backgroundImage: `repeating-linear-gradient(90deg, rgba(255,255,255,0.6) 0px, rgba(255,255,255,0.6) 1px, transparent 1px, transparent 80px),
+              repeating-linear-gradient(180deg, rgba(255,255,255,0.6) 0px, rgba(255,255,255,0.6) 1px, transparent 1px, transparent 80px)`,
+          }}
+          aria-hidden="true"
+        />
+        <div className="relative z-10 container-base max-w-3xl">
+          <div className="flex items-center gap-4 mb-6">
+            <span className="divider-accent" aria-hidden="true" />
+            <span className="text-eyebrow">{t('eyebrow')}</span>
+          </div>
+          <h1
+            className="font-display font-bold text-balance mb-6"
+            style={{
+              fontFamily: 'Montserrat, sans-serif',
+              fontSize: 'clamp(2rem, 5vw, 3rem)',
+              color: '#FFFFFF',
+              letterSpacing: '-0.025em',
+              lineHeight: '1.1',
+            }}
+          >
             {t('headline')}
           </h1>
-          <p className="text-lg text-brand-gray-300 mb-10 max-w-2xl">
+          <p
+            className="text-lg mb-10 max-w-2xl"
+            style={{ color: 'rgba(255,255,255,0.55)', lineHeight: '1.7' }}
+          >
             {t('sub')}
           </p>
           <div className="flex flex-wrap gap-4">
-            <Link
-              href={`/${locale}/lien-he`}
-              className="px-6 py-3 bg-brand-white text-brand-black text-sm font-medium hover:bg-brand-gray-100 transition-colors rounded-sm"
-            >
+            <Link href={`/${locale}/lien-he`} className="btn-primary">
               {t('cta_primary')}
             </Link>
-            <Link
-              href={`/${locale}/du-an`}
-              className="px-6 py-3 border border-brand-gray-600 text-brand-gray-200 text-sm font-medium hover:border-brand-white hover:text-brand-white transition-colors rounded-sm"
-            >
+            <Link href={`/${locale}/du-an`} className="btn-outline-white">
               {t('cta_secondary')}
             </Link>
           </div>
         </div>
       </section>
 
-      {/* Why Integration */}
-      <section className="section-padding bg-brand-white border-b border-brand-gray-100">
+      {/* ── WHY INTEGRATION ── */}
+      <section
+        className="section-padding"
+        style={{ background: '#1E1E1E' }}
+      >
         <div className="container-base">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-start">
             <div>
-              <h2 className="text-display-sm font-semibold text-brand-black mb-4">{t('why_headline')}</h2>
-              <p className="text-brand-gray-600 leading-relaxed">{t('why_desc')}</p>
+              <div className="flex items-center gap-4 mb-5">
+                <span className="divider-accent" aria-hidden="true" />
+              </div>
+              <h2
+                className="font-display font-bold mb-4"
+                style={{
+                  fontFamily: 'Montserrat, sans-serif',
+                  fontSize: 'clamp(1.5rem, 3vw, 2rem)',
+                  color: '#FFFFFF',
+                  letterSpacing: '-0.02em',
+                  lineHeight: '1.2',
+                }}
+              >
+                {t('why_headline')}
+              </h2>
+              <p className="text-base" style={{ color: 'rgba(255,255,255,0.5)', lineHeight: '1.7' }}>
+                {t('why_desc')}
+              </p>
             </div>
             <div className="flex flex-col gap-4">
               {[t('why_1'), t('why_2'), t('why_3')].map((item, i) => (
-                <div key={i} className="flex items-start gap-4 p-5 bg-brand-gray-50 rounded-sm">
-                  <span className="text-brand-gray-300 text-sm font-mono mt-0.5">0{i + 1}</span>
-                  <p className="text-brand-black font-medium">{item}</p>
+                <div
+                  key={i}
+                  className="flex items-start gap-4 card-dark p-5"
+                >
+                  <span
+                    className="text-xs font-mono mt-0.5 shrink-0"
+                    style={{ color: 'rgba(255,107,53,0.7)', letterSpacing: '0.1em', fontWeight: 600 }}
+                  >
+                    0{i + 1}
+                  </span>
+                  <p className="text-sm font-medium" style={{ color: 'rgba(255,255,255,0.75)', lineHeight: '1.6' }}>
+                    {item}
+                  </p>
                 </div>
               ))}
             </div>
@@ -110,18 +157,62 @@ export default async function SolutionPage({ params }: Props) {
         </div>
       </section>
 
-      {/* Three Pillars */}
-      <section className="section-padding bg-brand-black text-brand-white">
+      {/* ── THREE PILLARS ── */}
+      <section
+        className="section-padding"
+        style={{ background: 'var(--gradient-hero)' }}
+      >
         <div className="container-base">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-px bg-brand-gray-700">
+          <div className="flex items-center gap-4 mb-5">
+            <span className="divider-accent" aria-hidden="true" />
+            <span className="text-eyebrow">{tHome('solution_eyebrow')}</span>
+          </div>
+          <h2
+            className="font-display font-bold mb-12"
+            style={{
+              fontFamily: 'Montserrat, sans-serif',
+              fontSize: 'clamp(1.5rem, 3vw, 2rem)',
+              color: '#FFFFFF',
+              letterSpacing: '-0.02em',
+              lineHeight: '1.2',
+              maxWidth: '36ch',
+            }}
+          >
+            {tHome('solution_headline')}
+          </h2>
+          <div
+            className="grid grid-cols-1 md:grid-cols-3"
+            style={{ gap: '1px', background: 'rgba(255,255,255,0.07)', borderRadius: '2px', overflow: 'hidden' }}
+          >
             {pillars.map((pillar, i) => (
-              <article key={i} className="bg-brand-black p-10">
-                <span className="text-brand-gray-600 text-sm font-mono mb-6 block">{pillar.num}</span>
-                <h3 className="text-xl font-semibold text-brand-white mb-4">{pillar.title}</h3>
-                <p className="text-brand-gray-400 text-sm leading-relaxed mb-8">{pillar.desc}</p>
+              <article
+                key={i}
+                className="p-8 md:p-10 transition-colors duration-300"
+                style={{ background: 'rgba(26,26,26,0.95)' }}
+              >
+                <span
+                  className="block text-xs font-mono mb-6"
+                  style={{ color: 'rgba(255,107,53,0.6)', letterSpacing: '0.1em' }}
+                >
+                  {pillar.num}
+                </span>
+                <h3
+                  className="font-display font-bold mb-4"
+                  style={{ fontFamily: 'Montserrat, sans-serif', fontSize: '1.0625rem', color: '#FFFFFF', lineHeight: '1.3' }}
+                >
+                  {pillar.title}
+                </h3>
+                <p
+                  className="text-sm leading-relaxed mb-8"
+                  style={{ color: 'rgba(255,255,255,0.45)', lineHeight: '1.65' }}
+                >
+                  {pillar.desc}
+                </p>
                 <div className="flex items-center gap-2">
-                  <div className="w-6 h-px bg-brand-accent" />
-                  <span className="text-brand-accent text-sm font-medium">{pillar.outcome}</span>
+                  <div style={{ width: '1.5rem', height: '2px', background: '#FF6B35' }} aria-hidden="true" />
+                  <span className="text-sm font-semibold" style={{ color: '#FF6B35', fontFamily: 'Inter, sans-serif' }}>
+                    {pillar.outcome}
+                  </span>
                 </div>
               </article>
             ))}
@@ -129,29 +220,75 @@ export default async function SolutionPage({ params }: Props) {
         </div>
       </section>
 
-      {/* Packages */}
-      <section className="section-padding bg-brand-white">
+      {/* ── PACKAGES ── */}
+      <section
+        className="section-padding"
+        style={{ background: '#1A1A1A' }}
+      >
         <div className="container-base">
-          <h2 className="text-display-sm font-semibold text-brand-black mb-12">{t('package_headline')}</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="flex items-center gap-4 mb-5">
+            <span className="divider-accent" aria-hidden="true" />
+          </div>
+          <h2
+            className="font-display font-bold mb-12"
+            style={{
+              fontFamily: 'Montserrat, sans-serif',
+              fontSize: 'clamp(1.5rem, 3vw, 2rem)',
+              color: '#FFFFFF',
+              letterSpacing: '-0.02em',
+              lineHeight: '1.2',
+            }}
+          >
+            {t('package_headline')}
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
             {packages.map((pkg, i) => (
               <div
                 key={i}
-                className={`p-8 rounded-sm border ${
+                className="p-8 flex flex-col"
+                style={
                   pkg.highlight
-                    ? 'border-brand-black bg-brand-black text-brand-white'
-                    : 'border-brand-gray-100 bg-brand-white'
-                }`}
+                    ? {
+                        background: 'rgba(255,107,53,0.08)',
+                        border: '1px solid rgba(255,107,53,0.3)',
+                        borderRadius: '2px',
+                      }
+                    : {
+                        background: 'rgba(255,255,255,0.04)',
+                        border: '1px solid rgba(255,255,255,0.08)',
+                        borderRadius: '2px',
+                      }
+                }
               >
-                <h3 className={`text-lg font-semibold mb-2 ${pkg.highlight ? 'text-brand-white' : 'text-brand-black'}`}>
+                {pkg.highlight && (
+                  <span
+                    className="text-xs font-semibold mb-3 block"
+                    style={{ color: '#FF6B35', letterSpacing: '0.1em', textTransform: 'uppercase', fontFamily: 'Inter, sans-serif' }}
+                  >
+                    {locale === 'vi' ? 'Phổ biến nhất' : 'Most Popular'}
+                  </span>
+                )}
+                <h3
+                  className="font-semibold mb-2"
+                  style={{
+                    fontFamily: 'Montserrat, sans-serif',
+                    fontSize: '1.0625rem',
+                    color: pkg.highlight ? '#FF6B35' : '#FFFFFF',
+                    lineHeight: '1.3',
+                  }}
+                >
                   {pkg.name}
                 </h3>
-                <p className={`text-sm mb-8 ${pkg.highlight ? 'text-brand-gray-300' : 'text-brand-gray-500'}`}>
+                <p
+                  className="text-sm mb-8 flex-1"
+                  style={{ color: 'rgba(255,255,255,0.45)', lineHeight: '1.65' }}
+                >
                   {pkg.desc}
                 </p>
                 <Link
                   href={`/${locale}/lien-he?package=${pkg.name.toLowerCase()}`}
-                  className={`text-sm font-medium hover:underline ${pkg.highlight ? 'text-brand-white' : 'text-brand-black'}`}
+                  className="text-sm font-medium transition-colors"
+                  style={{ color: pkg.highlight ? '#FF6B35' : 'rgba(255,255,255,0.5)', fontFamily: 'Inter, sans-serif' }}
                 >
                   {t('pkg_cta')} →
                 </Link>

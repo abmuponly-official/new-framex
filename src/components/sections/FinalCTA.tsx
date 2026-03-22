@@ -9,52 +9,70 @@ export default async function FinalCTA({ locale }: Props) {
 
   return (
     <section
-      className="section-padding bg-brand-black text-brand-white"
+      className="section-padding"
       aria-labelledby="final-cta-heading"
+      style={{ background: '#1A1A1A' }}
     >
-      <div className="container-base text-center max-w-2xl">
-        <h2
-          id="final-cta-heading"
-          className="text-display-md font-semibold text-brand-white mb-4"
-        >
-          {t('final_headline')}
-        </h2>
-        <p className="text-brand-gray-400 text-base mb-10">
-          {t('final_sub')}
-        </p>
+      <div className="container-base">
+        <div className="max-w-2xl mx-auto text-center">
 
-        {/* CTA buttons */}
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-          <Link
-            href={`/${locale}/lien-he`}
-            className="px-8 py-3.5 bg-brand-white text-brand-black text-sm font-medium
-              hover:bg-brand-gray-100 transition-colors rounded-sm min-w-[160px]"
+          {/* Orange accent line */}
+          <div className="flex justify-center mb-8 reveal">
+            <span className="divider-accent" aria-hidden="true" />
+          </div>
+
+          <h2
+            id="final-cta-heading"
+            className="font-display font-bold text-balance mb-4 reveal reveal-delay-1"
+            style={{
+              fontFamily: 'Montserrat, sans-serif',
+              fontSize: 'clamp(1.5rem, 3vw, 2.25rem)',
+              color: '#FFFFFF',
+              letterSpacing: '-0.02em',
+              lineHeight: '1.2',
+            }}
           >
-            {t('final_cta_1')}
-          </Link>
-          <Link
-            href={`/${locale}/lien-he?type=rfq`}
-            className="px-8 py-3.5 border border-brand-gray-600 text-brand-gray-200 text-sm font-medium
-              hover:border-brand-white hover:text-brand-white transition-colors rounded-sm min-w-[160px]"
+            {t('final_headline')}
+          </h2>
+          <p
+            className="text-base mb-10 reveal reveal-delay-2"
+            style={{ color: 'rgba(255,255,255,0.45)', lineHeight: '1.7', maxWidth: '52ch', margin: '0 auto 2.5rem' }}
           >
-            {t('final_cta_2')}
-          </Link>
-        </div>
+            {t('final_sub')}
+          </p>
 
-        {/* Microcopy */}
-        <p className="mt-5 text-xs text-brand-gray-600">
-          {t('final_microcopy')}
-        </p>
+          {/* CTAs */}
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 reveal reveal-delay-2">
+            <Link href={`/${locale}/lien-he`} className="btn-primary min-w-[160px]">
+              {t('final_cta_1')}
+            </Link>
+            <Link href={`/${locale}/lien-he?type=rfq`} className="btn-outline-white min-w-[160px]">
+              {t('final_cta_2')}
+            </Link>
+          </div>
 
-        {/* Footer micro bullets */}
-        <div className="mt-14 pt-8 border-t border-brand-gray-800
-          flex flex-col md:flex-row items-center justify-center gap-2 md:gap-6
-          text-brand-gray-600 text-sm">
-          <span>{t('final_footer_1')}</span>
-          <span className="hidden md:inline text-brand-gray-700">·</span>
-          <span>{t('final_footer_2')}</span>
-          <span className="hidden md:inline text-brand-gray-700">·</span>
-          <span>{t('final_footer_3')}</span>
+          {/* Microcopy */}
+          <p
+            className="mt-5 text-xs reveal reveal-delay-3"
+            style={{ color: 'rgba(255,255,255,0.25)', letterSpacing: '0.02em' }}
+          >
+            {t('final_microcopy')}
+          </p>
+
+          {/* Footer micro bullets */}
+          <div
+            className="mt-14 pt-8 flex flex-col md:flex-row items-center justify-center gap-2 md:gap-8 reveal reveal-delay-3"
+            style={{ borderTop: '1px solid rgba(255,255,255,0.08)' }}
+          >
+            {[t('final_footer_1'), t('final_footer_2'), t('final_footer_3')].map((item, i) => (
+              <div key={i} className="flex items-center gap-2">
+                {i > 0 && <span className="hidden md:inline" style={{ color: 'rgba(255,107,53,0.3)' }}>·</span>}
+                <span className="text-xs" style={{ color: 'rgba(255,255,255,0.3)', letterSpacing: '0.03em' }}>
+                  {item}
+                </span>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     </section>
