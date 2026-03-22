@@ -38,12 +38,16 @@ export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   // ── Admin route protection ─────────────────────────────────────────────────
+  // Note: deep auth check (getUser) is done in each admin layout Server Component.
+  // Here we do a lightweight cookie presence check for fast redirect.
   if (pathname.startsWith('/admin') && !pathname.startsWith('/admin/login')) {
-    const sessionCookie =
-      request.cookies.get('sb-access-token') ||
-      request.cookies.get('supabase-auth-token');
-
-    if (!sessionCookie) {
+    const cookies = request.cookies.getAll();
+    const hasSession = cookies.some(
+      (c) =>
+        c.name.startsWith('sb-') &&
+        (c.name.endsWith('-auth-token') || c.name.endsWith('-auth-token.0'))
+    );
+    if (!hasSession) {
       const loginUrl = new URL('/admin/login', request.url);
       loginUrl.searchParams.set('redirect', pathname);
       return NextResponse.redirect(loginUrl);
