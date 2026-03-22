@@ -23,6 +23,7 @@ export default async function FinalCTA({ locale }: Props) {
           {t('final_sub')}
         </p>
 
+        {/* CTA buttons */}
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
           <Link
             href={`/${locale}/lien-he`}
@@ -40,8 +41,13 @@ export default async function FinalCTA({ locale }: Props) {
           </Link>
         </div>
 
-        {/* Footer micro-copy */}
-        <div className="mt-16 pt-8 border-t border-brand-gray-800
+        {/* Microcopy */}
+        <p className="mt-5 text-xs text-brand-gray-600">
+          {t('final_microcopy')}
+        </p>
+
+        {/* Footer micro bullets */}
+        <div className="mt-14 pt-8 border-t border-brand-gray-800
           flex flex-col md:flex-row items-center justify-center gap-2 md:gap-6
           text-brand-gray-600 text-sm">
           <span>{t('final_footer_1')}</span>

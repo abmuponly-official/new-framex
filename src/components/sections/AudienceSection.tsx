@@ -34,13 +34,20 @@ export default async function AudienceSection({ locale }: Props) {
       aria-labelledby="audience-heading"
     >
       <div className="container-base">
+        {/* Headline */}
         <h2
           id="audience-heading"
-          className="text-display-md font-semibold text-brand-black mb-12"
+          className="text-display-md font-semibold text-brand-black mb-4 max-w-3xl"
         >
           {t('audience_headline')}
         </h2>
 
+        {/* Supporting paragraph */}
+        <p className="text-brand-gray-500 text-base mb-12 max-w-2xl">
+          {t('audience_sub')}
+        </p>
+
+        {/* Audience cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {audiences.map((a, i) => (
             <Link
