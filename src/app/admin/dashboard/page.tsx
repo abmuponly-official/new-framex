@@ -33,11 +33,18 @@ export default async function AdminDashboardPage() {
     .order('created_at', { ascending: false })
     .limit(5);
 
-  const { data: recentAudit } = await admin
-    .from('audit_log')
-    .select('id, action, table_name, created_at')
-    .order('created_at', { ascending: false })
-    .limit(5);
+  // audit_log: graceful fallback — table may have RLS or join issues
+  let recentAudit: Array<{ id: string; action: string; table_name: string; created_at: string }> | null = null;
+  try {
+    const { data } = await admin
+      .from('audit_log')
+      .select('id, action, table_name, created_at')
+      .order('created_at', { ascending: false })
+      .limit(5);
+    recentAudit = data;
+  } catch {
+    recentAudit = null;
+  }
 
   return (
     <AdminShell user={user}>

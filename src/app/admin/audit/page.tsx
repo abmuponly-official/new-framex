@@ -21,13 +21,16 @@ export default async function AdminAuditPage({
   const from = (page - 1) * perPage;
   const table = searchParams.table;
 
+  // Note: do NOT join user_id — it can be NULL (public contact form triggers)
+  // which causes PostgREST FK join to throw a server error
   let query = admin
     .from('audit_log')
-    .select('*, user:user_id(email)', { count: 'exact' });
+    .select('id, action, table_name, record_id, new_values, user_id, created_at', { count: 'exact' });
   if (table && table !== 'all') query = query.eq('table_name', table);
   query = query.order('created_at', { ascending: false }).range(from, from + perPage - 1);
 
-  const { data: logs, count } = await query;
+  const { data: logs, count, error: auditError } = await query;
+  if (auditError) console.error('[audit] query error:', auditError.message);
   const totalPages = Math.ceil((count ?? 0) / perPage);
 
   return (
@@ -67,7 +70,7 @@ export default async function AdminAuditPage({
               </tr>
             </thead>
             <tbody>
-              {logs?.length ? logs.map((log: AuditLog & { user?: { email: string } }) => (
+              {logs?.length ? logs.map((log: AuditLog) => (
                 <tr key={log.id}>
                   <td style={{ fontSize: 12, color: '#6b7280', whiteSpace: 'nowrap' }}>
                     {formatDateTime(log.created_at)}
@@ -85,8 +88,8 @@ export default async function AdminAuditPage({
                   <td style={{ fontFamily: 'monospace', fontSize: 11, color: '#9ca3af' }}>
                     {log.record_id?.slice(0, 8)}…
                   </td>
-                  <td style={{ fontSize: 13 }}>
-                    {(log.user as unknown as { email: string } | undefined)?.email ?? '—'}
+                  <td style={{ fontSize: 13, color: '#9ca3af' }}>
+                    {log.user_id ? log.user_id.slice(0, 8) + '…' : 'Public'}
                   </td>
                   <td>
                     {log.new_values && (
