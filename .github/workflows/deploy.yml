@@ -45,14 +45,19 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: npm
-      - run: npm ci
-      - uses: actions/cache@v4
+      - name: Install dependencies
+        run: npm ci
+      - name: Cache Next.js build
+        uses: actions/cache@v4
         with:
           path: |
             ~/.npm
             ${{ github.workspace }}/.next/cache
-          key: ${{ runner.os }}-nextjs-${{ hashFiles('**/package-lock.json') }}
-      - name: Build
+          key: ${{ runner.os }}-nextjs-${{ hashFiles('**/package-lock.json') }}-${{ hashFiles('**/*.ts', '**/*.tsx') }}
+          restore-keys: |
+            ${{ runner.os }}-nextjs-${{ hashFiles('**/package-lock.json') }}-
+            ${{ runner.os }}-nextjs-
+      - name: Build Next.js
         run: npm run build
         env:
           NODE_OPTIONS: '--max-old-space-size=4096'
@@ -60,6 +65,11 @@ jobs:
           NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
           NEXT_PUBLIC_SITE_URL: ${{ secrets.NEXT_PUBLIC_SITE_URL }}
+      - name: Remove cache before deploy
+        run: |
+          rm -rf .next/cache
+          echo "Deploy size:" && du -sh .next/
+          find .next -size +20M -type f 2>/dev/null && echo "⚠️ Large files!" || echo "✅ No files > 20MB"
       - name: 🌐 Deploy Production
         if: github.ref == 'refs/heads/main' && github.event_name == 'push'
         uses: cloudflare/pages-action@v1
