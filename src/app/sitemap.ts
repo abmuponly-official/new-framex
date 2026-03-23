@@ -31,6 +31,18 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         },
       },
     },
+    {
+      url: `${BASE_URL}/en${path}`,
+      lastModified: new Date(),
+      changeFrequency: 'monthly' as const,
+      priority: path === '' ? 0.95 : 0.75,
+      alternates: {
+        languages: {
+          vi: `${BASE_URL}/vi${path}`,
+          en: `${BASE_URL}/en${path}`,
+        },
+      },
+    },
   ]);
 
   // Dynamic: projects
@@ -58,6 +70,18 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
           },
         },
       },
+      {
+        url: `${BASE_URL}/en/du-an/${p.slug}`,
+        lastModified: new Date(p.updated_at),
+        changeFrequency: 'monthly' as const,
+        priority: 0.65,
+        alternates: {
+          languages: {
+            vi: `${BASE_URL}/vi/du-an/${p.slug}`,
+            en: `${BASE_URL}/en/du-an/${p.slug}`,
+          },
+        },
+      },
     ]);
 
     const { data: posts } = await supabase
@@ -71,6 +95,18 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         lastModified: new Date(p.updated_at),
         changeFrequency: 'weekly' as const,
         priority: 0.6,
+        alternates: {
+          languages: {
+            vi: `${BASE_URL}/vi/tin-tuc/${p.slug}`,
+            en: `${BASE_URL}/en/tin-tuc/${p.slug}`,
+          },
+        },
+      },
+      {
+        url: `${BASE_URL}/en/tin-tuc/${p.slug}`,
+        lastModified: new Date(p.updated_at),
+        changeFrequency: 'weekly' as const,
+        priority: 0.55,
         alternates: {
           languages: {
             vi: `${BASE_URL}/vi/tin-tuc/${p.slug}`,

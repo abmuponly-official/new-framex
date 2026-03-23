@@ -10,7 +10,14 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const locale = params.locale as Locale;
   setRequestLocale(locale);
   const t = await getTranslations({ locale, namespace: 'contact' });
-  return { title: t('headline'), description: t('sub') };
+  return {
+    title: t('headline'),
+    description: t('sub'),
+    alternates: {
+      canonical: `/${locale}/lien-he`,
+      languages: { vi: '/vi/lien-he', en: '/en/lien-he' },
+    },
+  };
 }
 
 /* ── Icon helpers (inline SVG — no external dep) ─────────────────────────── */

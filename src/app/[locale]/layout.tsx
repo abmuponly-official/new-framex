@@ -43,6 +43,12 @@ export async function generateMetadata({
         en: '/en',
       },
     },
+    openGraph: {
+      locale: locale === 'vi' ? 'vi_VN' : 'en_US',
+      alternateLocale: locale === 'vi' ? ['en_US'] : ['vi_VN'],
+      type: 'website',
+      siteName: 'FrameX',
+    },
   };
 }
 
@@ -65,15 +71,23 @@ export default async function LocaleLayout({ children, params }: Props) {
           href="https://fonts.gstatic.com"
           crossOrigin="anonymous"
         />
-        {/* Montserrat — display headings (per FrameX Brand Bible) */}
-        {/* Inter — body copy (clean, modern) */}
+        {/* Montserrat — display headings | Inter — body copy */}
         <link
-          href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600&display=swap"
+          rel="preload"
+          as="style"
+          href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800&family=Inter:wght@400;500;600&display=swap"
+        />
+        <link
+          href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800&family=Inter:wght@400;500;600&display=swap"
           rel="stylesheet"
         />
       </head>
       <body className="bg-brand-white text-brand-black font-sans antialiased" style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>
         <NextIntlClientProvider messages={messages}>
+          {/* Skip-to-content for keyboard / AT users */}
+          <a href="#main-content" className="skip-to-content">
+            {locale === 'vi' ? 'Bỏ qua đến nội dung chính' : 'Skip to main content'}
+          </a>
           <Header locale={locale} />
           <main id="main-content">{children}</main>
           <Footer locale={locale} />

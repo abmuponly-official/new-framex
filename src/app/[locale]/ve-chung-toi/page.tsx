@@ -10,7 +10,14 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const locale = params.locale as Locale;
   setRequestLocale(locale);
   const t = await getTranslations({ locale, namespace: 'about' });
-  return { title: t('headline'), description: t('sub') };
+  return {
+    title: t('headline'),
+    description: t('sub'),
+    alternates: {
+      canonical: `/${locale}/ve-chung-toi`,
+      languages: { vi: '/vi/ve-chung-toi', en: '/en/ve-chung-toi' },
+    },
+  };
 }
 
 export default async function AboutPage({ params }: Props) {

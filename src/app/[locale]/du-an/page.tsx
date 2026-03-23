@@ -20,7 +20,14 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const locale = params.locale as Locale;
   setRequestLocale(locale);
   const t = await getTranslations({ locale, namespace: 'projects' });
-  return { title: t('headline'), description: t('sub') };
+  return {
+    title: t('headline'),
+    description: t('sub'),
+    alternates: {
+      canonical: `/${locale}/du-an`,
+      languages: { vi: '/vi/du-an', en: '/en/du-an' },
+    },
+  };
 }
 
 export default async function ProjectsPage({ params, searchParams }: Props) {

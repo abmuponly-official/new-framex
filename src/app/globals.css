@@ -430,3 +430,42 @@ body {
     transition: none !important;
   }
 }
+
+/* ─── Accessibility — focus-visible ─────────────────────────────────────────
+ * Visible keyboard-focus ring using :focus-visible (not :focus)
+ * so mouse users don't see the ring but keyboard users do.
+ * ─────────────────────────────────────────────────────────────────────────── */
+:focus-visible {
+  outline: 2px solid var(--color-orange);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+/* ─── Skip-to-content link ────────────────────────────────────────────────── */
+.skip-to-content {
+  position: absolute;
+  left: -9999px;
+  top: 1rem;
+  z-index: 9999;
+  padding: 0.5rem 1rem;
+  background: var(--color-orange);
+  color: #fff;
+  font-weight: 600;
+  font-size: 0.875rem;
+  border-radius: 2px;
+  text-decoration: none;
+}
+.skip-to-content:focus {
+  left: 1rem;
+}
+
+/* ─── Breadcrumb structured data helper ──────────────────────────────────── */
+.breadcrumb-list {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}

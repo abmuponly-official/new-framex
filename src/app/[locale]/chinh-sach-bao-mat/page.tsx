@@ -8,7 +8,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const locale = params.locale as Locale;
   setRequestLocale(locale);
   const t = await getTranslations({ locale, namespace: 'privacy' });
-  return { title: t('title') };
+  return {
+    title: t('title'),
+    alternates: {
+      canonical: `/${locale}/chinh-sach-bao-mat`,
+      languages: { vi: '/vi/chinh-sach-bao-mat', en: '/en/chinh-sach-bao-mat' },
+    },
+  };
 }
 
 export default async function PrivacyPage({ params }: Props) {

@@ -1,4 +1,4 @@
-import { getTranslations } from 'next-intl/server';
+import { getTranslations, setRequestLocale } from 'next-intl/server';
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
@@ -14,6 +14,7 @@ export const revalidate = 60; // ISR — revalidate every 60 seconds
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const locale = params.locale as Locale;
+  setRequestLocale(locale);
   try {
     const supabase = await createClient();
     const { data } = await supabase
@@ -22,9 +23,30 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       .eq('slug', params.slug)
       .single();
     if (!data) return { title: 'Project not found' };
+    const title       = tField(data, 'meta_title', locale) || tField(data, 'title', locale);
+    const description = tField(data, 'meta_desc',  locale) || tField(data, 'excerpt', locale);
     return {
-      title: tField(data, 'meta_title', locale) || tField(data, 'title', locale),
-      description: tField(data, 'meta_desc', locale) || tField(data, 'excerpt', locale),
+      title,
+      description,
+      alternates: {
+        canonical: `/${locale}/du-an/${params.slug}`,
+        languages: {
+          vi: `/vi/du-an/${params.slug}`,
+          en: `/en/du-an/${params.slug}`,
+        },
+      },
+      openGraph: {
+        title,
+        description,
+        type: 'article',
+        images: data.cover_image ? [{ url: data.cover_image, width: 1200, height: 630, alt: title }] : [],
+      },
+      twitter: {
+        card: 'summary_large_image',
+        title,
+        description,
+        images: data.cover_image ? [data.cover_image] : [],
+      },
     };
   } catch {
     return { title: 'Project' };
@@ -124,6 +146,8 @@ export default async function ProjectDetailPage({ params }: Props) {
               src={project.cover_image}
               alt={tField(project as never, 'title', locale)}
               className="w-full aspect-[16/9] object-cover"
+              loading="eager"
+              decoding="async"
             />
           </div>
         </div>

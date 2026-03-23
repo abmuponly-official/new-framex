@@ -20,7 +20,14 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const locale = params.locale as Locale;
   setRequestLocale(locale);
   const t = await getTranslations({ locale, namespace: 'blog' });
-  return { title: t('headline'), description: t('sub') };
+  return {
+    title: t('headline'),
+    description: t('sub'),
+    alternates: {
+      canonical: `/${locale}/tin-tuc`,
+      languages: { vi: '/vi/tin-tuc', en: '/en/tin-tuc' },
+    },
+  };
 }
 
 export default async function BlogPage({ params, searchParams }: Props) {

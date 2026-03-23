@@ -8,7 +8,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const locale = params.locale as Locale;
   setRequestLocale(locale);
   const t = await getTranslations({ locale, namespace: 'terms' });
-  return { title: t('title') };
+  return {
+    title: t('title'),
+    alternates: {
+      canonical: `/${locale}/dieu-khoan-su-dung`,
+      languages: { vi: '/vi/dieu-khoan-su-dung', en: '/en/dieu-khoan-su-dung' },
+    },
+  };
 }
 
 export default async function TermsPage({ params }: Props) {

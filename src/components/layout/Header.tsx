@@ -119,7 +119,7 @@ export default function Header({ locale }: Props) {
 
             {/* ── Right: lang switcher + CTA ── */}
             <div className="flex items-center gap-3">
-              <LanguageSwitcher locale={locale} />
+              <LanguageSwitcher locale={locale} dark={isScrolled} />
 
               {/* CTA button — primary orange */}
               <Link
