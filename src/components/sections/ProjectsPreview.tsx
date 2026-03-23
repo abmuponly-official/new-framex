@@ -4,6 +4,7 @@ import type { Locale } from '@/lib/i18n/request';
 import { createClient } from '@/lib/supabase/server';
 import { t as tField } from '@/types/content';
 import type { Project } from '@/types/content';
+import Image from 'next/image';
 
 type Props = { locale: Locale };
 
@@ -64,11 +65,12 @@ export default async function ProjectsPreview({ locale }: Props) {
                 {/* Image */}
                 <div className="aspect-[4/3] bg-brand-gray-100 mb-4 overflow-hidden rounded-sm">
                   {project.cover_image ? (
-                    <img
+                    <Image
                       src={project.cover_image}
                       alt={tField(project as never, 'title', locale)}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                      loading="lazy"
+                      fill
+                      className="object-cover group-hover:scale-105 transition-transform duration-500"
+                      sizes="(max-width: 768px) 100vw, 33vw"
                     />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center">

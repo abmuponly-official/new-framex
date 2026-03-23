@@ -6,6 +6,7 @@ import type { Locale } from '@/lib/i18n/request';
 import { createClient } from '@/lib/supabase/server';
 import { t as tField } from '@/types/content';
 import type { Project, ProjectCategory } from '@/types/content';
+import Image from 'next/image';
 import FilterBar from '@/components/ui/FilterBar';
 import Pagination from '@/components/ui/Pagination';
 
@@ -251,18 +252,13 @@ function ProjectCard({
         }}
       >
         {project.cover_image ? (
-          <img
+          <Image
             src={project.cover_image}
             alt={title}
-            style={{
-              width: '100%',
-              height: '100%',
-              objectFit: 'cover',
-              display: 'block',
-              transition: 'transform 0.7s ease',
-            }}
+            fill
+            style={{ objectFit: 'cover', display: 'block', transition: 'transform 0.7s ease' }}
             className="group-hover:scale-105"
-            loading="lazy"
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
           />
         ) : (
           <div

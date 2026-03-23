@@ -7,6 +7,7 @@ import { createClient } from '@/lib/supabase/server';
 import { t as tField } from '@/types/content';
 import type { Post } from '@/types/content';
 import JsonLd from '@/components/seo/JsonLd';
+import Image from 'next/image';
 
 type Props = { params: { locale: string; slug: string } };
 
@@ -147,12 +148,13 @@ export default async function BlogDetailPage({ params }: Props) {
           </div>
 
           {post.cover_image && (
-            <img
+            <Image
               src={post.cover_image}
               alt={tField(post as never, 'title', locale)}
+              width={1200}
+              height={675}
               className="w-full rounded-sm mb-12"
-              loading="eager"
-              decoding="async"
+              priority
             />
           )}
 
