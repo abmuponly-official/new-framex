@@ -250,18 +250,18 @@ body {
   }
   .prose-framex h2 {
     font-family: var(--font-display);
-    @apply text-2xl font-bold mt-12 mb-4;
+    @apply text-2xl font-bold mt-8 mb-3;
     color: var(--color-charcoal);
     overflow-wrap: break-word;
   }
   .prose-framex h3 {
     font-family: var(--font-display);
-    @apply text-xl font-semibold mt-8 mb-3;
+    @apply text-xl font-semibold mt-6 mb-2;
     color: var(--color-charcoal);
     overflow-wrap: break-word;
   }
-  .prose-framex p     { @apply mb-5; overflow-wrap: anywhere; }
-  .prose-framex ul    { @apply list-disc pl-6 mb-5 space-y-2; }
+  .prose-framex p     { @apply mb-4; overflow-wrap: anywhere; }
+  .prose-framex ul    { @apply list-disc pl-6 mb-4 space-y-1; }
   .prose-framex strong {
     font-weight: 700;
     color: var(--color-charcoal);
@@ -276,6 +276,9 @@ body {
     max-width: 100%;
     height: auto;
     display: block;
+    margin-top: 1.25rem;
+    margin-bottom: 1.25rem;
+    border-radius: 2px;
   }
   .prose-framex table {
     width: 100%;

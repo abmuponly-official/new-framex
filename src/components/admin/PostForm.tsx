@@ -246,7 +246,7 @@ function SimpleEditor({ value, onChange, placeholder }: { value: string; onChang
         dangerouslySetInnerHTML={{ __html: value }}
         onInput={(e) => onChange((e.target as HTMLDivElement).innerHTML)}
         data-placeholder={placeholder}
-        style={{ minHeight: 300, maxWidth: '100%', boxSizing: 'border-box' }}
+        style={{ minHeight: 240, maxWidth: '100%', boxSizing: 'border-box' }}
       />
     </div>
   );

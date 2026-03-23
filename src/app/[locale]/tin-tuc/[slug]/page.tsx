@@ -114,10 +114,10 @@ export default async function BlogDetailPage({ params }: Props) {
         </div>
       </nav>
 
-      <article className="section-padding bg-brand-white">
+      <article className="bg-brand-white" style={{ paddingTop: '2.5rem', paddingBottom: '3rem' }}>
         <div className="container-base max-w-3xl">
           {post.category && (
-            <p className="text-xs uppercase tracking-widest text-brand-gray-400 mb-4 font-medium">
+            <p className="text-xs uppercase tracking-widest text-brand-gray-400 mb-3 font-medium">
               {post.category === 'pain-based'  ? (locale === 'vi' ? 'Tình huống thực tế' : 'Pain-based')  :
                post.category === 'comparative' ? (locale === 'vi' ? 'So sánh'            : 'Comparative')  :
                post.category === 'case-based'  ? (locale === 'vi' ? 'Case study'         : 'Case study')   :
@@ -125,14 +125,14 @@ export default async function BlogDetailPage({ params }: Props) {
                post.category}
             </p>
           )}
-          <h1 className="text-display-md font-semibold text-brand-black mb-4" style={{ overflowWrap: 'break-word', wordBreak: 'break-word' }}>
+          <h1 className="text-display-md font-semibold text-brand-black mb-3" style={{ overflowWrap: 'break-word', wordBreak: 'break-word' }}>
             {tField(post as never, 'title', locale)}
           </h1>
-          <p className="text-lg text-brand-gray-500 mb-8" style={{ overflowWrap: 'break-word' }}>
+          <p className="text-lg text-brand-gray-500 mb-5" style={{ overflowWrap: 'break-word' }}>
             {tField(post as never, 'excerpt', locale)}
           </p>
 
-          <div className="flex gap-4 text-sm text-brand-gray-400 mb-12 pb-8 border-b border-brand-gray-100">
+          <div className="flex gap-4 text-sm text-brand-gray-400 mb-6 pb-5 border-b border-brand-gray-100">
             {post.published_at && (
               <time dateTime={post.published_at}>
                 {new Date(post.published_at).toLocaleDateString(
@@ -150,7 +150,8 @@ export default async function BlogDetailPage({ params }: Props) {
             <img
               src={post.cover_image}
               alt={tField(post as never, 'title', locale)}
-              className="w-full rounded-sm mb-12"
+              className="w-full rounded-sm mb-8"
+              style={{ display: 'block', maxHeight: '520px', objectFit: 'cover' }}
               loading="eager"
               decoding="async"
             />
@@ -165,7 +166,7 @@ export default async function BlogDetailPage({ params }: Props) {
         </div>
       </article>
 
-      <div className="py-12 border-t border-brand-gray-100 bg-brand-white">
+      <div className="py-8 border-t border-brand-gray-100 bg-brand-white">
         <div className="container-base flex flex-col sm:flex-row justify-between gap-6 items-start sm:items-center">
           <Link
             href={`/${locale}/tin-tuc`}

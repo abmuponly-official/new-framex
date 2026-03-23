@@ -75,7 +75,7 @@ export default async function BlogPage({ params, searchParams }: Props) {
     <>
       {/* ── PAGE HEADER ──────────────────────────────────────────────────── */}
       <section
-        className="pt-36 pb-20 relative overflow-hidden"
+        className="pt-32 pb-12 relative overflow-hidden"
         style={{ background: 'var(--gradient-hero)' }}
       >
         <div
@@ -130,7 +130,7 @@ export default async function BlogPage({ params, searchParams }: Props) {
       </section>
 
       {/* ── FILTER + GRID ────────────────────────────────────────────────── */}
-      <section className="section-padding" style={{ background: '#1A1A1A' }}>
+      <section className="bg-[#1A1A1A]" style={{ paddingTop: '2.5rem', paddingBottom: '3.5rem' }}>
         <div className="container-base">
 
           {/* Filter bar — pillar categories */}

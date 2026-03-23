@@ -108,7 +108,7 @@ export default async function ProjectDetailPage({ params }: Props) {
       </nav>
 
       {/* Hero */}
-      <section className="py-16 bg-brand-white border-b border-brand-gray-100">
+      <section className="py-10 bg-brand-white border-b border-brand-gray-100">
         <div className="container-base max-w-4xl">
           <div className="flex flex-wrap gap-2 mb-4">
             {project.has_watertest && (
@@ -130,7 +130,7 @@ export default async function ProjectDetailPage({ params }: Props) {
           </p>
 
           {/* Meta info */}
-          <div className="flex flex-wrap gap-6 mt-8 text-sm text-brand-gray-400">
+          <div className="flex flex-wrap gap-4 mt-5 text-sm text-brand-gray-400">
             {project.client_name && <span>{project.client_name}</span>}
             {project.location && <span>{project.location}</span>}
             {project.year && <span>{project.year}</span>}
@@ -141,11 +141,12 @@ export default async function ProjectDetailPage({ params }: Props) {
       {/* Cover image */}
       {project.cover_image && (
         <div className="bg-brand-gray-50">
-          <div className="container-base py-0">
+          <div className="container-base" style={{ paddingTop: 0, paddingBottom: 0 }}>
             <img
               src={project.cover_image}
               alt={tField(project as never, 'title', locale)}
-              className="w-full aspect-[16/9] object-cover"
+              className="w-full"
+              style={{ display: 'block', maxHeight: '520px', objectFit: 'cover' }}
               loading="eager"
               decoding="async"
             />
@@ -154,7 +155,7 @@ export default async function ProjectDetailPage({ params }: Props) {
       )}
 
       {/* Content */}
-      <article className="section-padding bg-brand-white">
+      <article className="bg-brand-white" style={{ paddingTop: '2.5rem', paddingBottom: '3rem' }}>
         <div className="container-base max-w-3xl">
           <div
             className="prose-framex"
@@ -167,7 +168,7 @@ export default async function ProjectDetailPage({ params }: Props) {
 
       {/* Gallery */}
       {project.gallery?.length > 0 && (
-        <section className="section-padding bg-brand-gray-50 border-t border-brand-gray-100">
+        <section className="bg-brand-gray-50 border-t border-brand-gray-100" style={{ paddingTop: '2rem', paddingBottom: '2.5rem' }}>
           <div className="container-base">
             <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
               {project.gallery.map((item, i) => (
@@ -191,7 +192,7 @@ export default async function ProjectDetailPage({ params }: Props) {
       )}
 
       {/* Back + CTA */}
-      <section className="py-16 bg-brand-white border-t border-brand-gray-100">
+      <section className="py-10 bg-brand-white border-t border-brand-gray-100">
         <div className="container-base flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
           <Link
             href={`/${locale}/du-an`}
