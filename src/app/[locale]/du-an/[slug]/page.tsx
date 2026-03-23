@@ -73,11 +73,13 @@ export default async function ProjectDetailPage({ params }: Props) {
       {/* Breadcrumb */}
       <nav className="pt-24 pb-4 bg-brand-white border-b border-brand-gray-100" aria-label="Breadcrumb">
         <div className="container-base">
-          <ol className="flex items-center gap-2 text-sm text-brand-gray-400">
-            <li><Link href={`/${locale}`} className="hover:text-brand-black">FrameX</Link></li>
-            <li>/</li>
-            <li><Link href={`/${locale}/du-an`} className="hover:text-brand-black">{t('headline').split('.')[0]}</Link></li>
-            <li>/</li>
+          {/* overflow:hidden on <ol> prevents the flex row from overflowing when
+              the last breadcrumb item (project title) is very long */}
+          <ol className="flex items-center gap-2 text-sm text-brand-gray-400 overflow-hidden">
+            <li className="flex-shrink-0"><Link href={`/${locale}`} className="hover:text-brand-black">FrameX</Link></li>
+            <li className="flex-shrink-0">/</li>
+            <li className="flex-shrink-0"><Link href={`/${locale}/du-an`} className="hover:text-brand-black">{t('headline').split('.')[0]}</Link></li>
+            <li className="flex-shrink-0">/</li>
             <li className="text-brand-black line-clamp-1" style={{ overflow: 'hidden', textOverflow: 'ellipsis', minWidth: 0, flex: '1 1 0' }}>{tField(project as never, 'title', locale)}</li>
           </ol>
         </div>

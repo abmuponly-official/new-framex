@@ -192,9 +192,9 @@ export default function ProjectForm({ mode, initialData, userId }: Props) {
             </div>
           </div>
 
-          {/* Slug + Category */}
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 16 }}>
-            <div className="form-group">
+          {/* Slug + Category — min-width:0 on each cell prevents overflow */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: 16, marginBottom: 16 }}>
+            <div className="form-group" style={{ minWidth: 0 }}>
               <label className="form-label">Slug (URL) <span className="required">*</span></label>
               <input
                 className="form-input"
@@ -202,9 +202,9 @@ export default function ProjectForm({ mode, initialData, userId }: Props) {
                 onChange={e => setSlug(e.target.value)}
                 placeholder="tue-house"
               />
-              <p className="form-hint">URL: /vi/du-an/{slug || '…'}</p>
+              <p className="form-hint" title={`URL: /vi/du-an/${slug || '…'}`}>URL: /vi/du-an/{slug || '…'}</p>
             </div>
-            <div className="form-group">
+            <div className="form-group" style={{ minWidth: 0 }}>
               <label className="form-label">Danh mục</label>
               <select className="form-select" value={category} onChange={e => setCategory(e.target.value as 'residential' | 'fnb' | 'hospitality' | 'industrial')}>
                 {CATEGORIES.map(c => <option key={c.value} value={c.value}>{c.label}</option>)}
@@ -212,17 +212,17 @@ export default function ProjectForm({ mode, initialData, userId }: Props) {
             </div>
           </div>
 
-          {/* Client / Location / Year */}
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 16, marginBottom: 16 }}>
-            <div className="form-group">
+          {/* Client / Location / Year — repeat(3,minmax(0,1fr)) prevents child overflow */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: 16, marginBottom: 16 }}>
+            <div className="form-group" style={{ minWidth: 0 }}>
               <label className="form-label">Tên khách hàng</label>
               <input className="form-input" value={clientName} onChange={e => setClientName(e.target.value)} placeholder="Anh Tuệ" />
             </div>
-            <div className="form-group">
+            <div className="form-group" style={{ minWidth: 0 }}>
               <label className="form-label">Địa điểm</label>
               <input className="form-input" value={location} onChange={e => setLocation(e.target.value)} placeholder="TP. HCM" />
             </div>
-            <div className="form-group">
+            <div className="form-group" style={{ minWidth: 0 }}>
               <label className="form-label">Năm hoàn thành</label>
               <input className="form-input" type="number" value={year} onChange={e => setYear(e.target.value)} placeholder="2024" />
             </div>
@@ -405,7 +405,7 @@ function SimpleRichEditor({ value, onChange, placeholder }: {
         dangerouslySetInnerHTML={{ __html: value }}
         onInput={(e) => onChange((e.target as HTMLDivElement).innerHTML)}
         data-placeholder={placeholder}
-        style={{ minHeight: 220 }}
+        style={{ minHeight: 220, maxWidth: '100%', boxSizing: 'border-box' }}
       />
     </div>
   );

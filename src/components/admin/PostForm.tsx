@@ -116,19 +116,22 @@ export default function PostForm({ mode, initialData, userId }: Props) {
             </div>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 16, marginBottom: 16 }}>
-            <div className="form-group">
+          {/* 3-col meta row — min-width:0 on each cell prevents content from overflowing
+              on narrow admin panels; collapses to 1-col below 640px via flex-wrap */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: 16, marginBottom: 16 }}>
+            <div className="form-group" style={{ minWidth: 0 }}>
               <label className="form-label">Slug <span className="required">*</span></label>
               <input className="form-input" value={slug} onChange={e => setSlug(e.target.value)} placeholder="bai-viet-slug" />
-              <p className="form-hint">/vi/tin-tuc/{slug || '…'}</p>
+              {/* title attribute shows the full path on hover; CSS truncates long slugs */}
+              <p className="form-hint" title={`/vi/tin-tuc/${slug || '…'}`}>/vi/tin-tuc/{slug || '…'}</p>
             </div>
-            <div className="form-group">
+            <div className="form-group" style={{ minWidth: 0 }}>
               <label className="form-label">Chủ đề</label>
               <select className="form-select" value={category} onChange={e => setCategory(e.target.value as 'pain-based' | 'comparative' | 'case-based' | 'technical')}>
                 {CATEGORIES.map(c => <option key={c.value} value={c.value}>{c.label}</option>)}
               </select>
             </div>
-            <div className="form-group">
+            <div className="form-group" style={{ minWidth: 0 }}>
               <label className="form-label">Thời gian đọc (phút)</label>
               <input className="form-input" type="number" value={readingTime} onChange={e => setReadingTime(e.target.value)} placeholder="5" />
             </div>
@@ -243,7 +246,7 @@ function SimpleEditor({ value, onChange, placeholder }: { value: string; onChang
         dangerouslySetInnerHTML={{ __html: value }}
         onInput={(e) => onChange((e.target as HTMLDivElement).innerHTML)}
         data-placeholder={placeholder}
-        style={{ minHeight: 300 }}
+        style={{ minHeight: 300, maxWidth: '100%', boxSizing: 'border-box' }}
       />
     </div>
   );

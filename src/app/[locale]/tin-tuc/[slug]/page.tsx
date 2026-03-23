@@ -73,14 +73,19 @@ export default async function BlogDetailPage({ params }: Props) {
 
       <nav className="pt-24 pb-4 bg-brand-white border-b border-brand-gray-100" aria-label="Breadcrumb">
         <div className="container-base">
-          <ol className="flex items-center gap-2 text-sm text-brand-gray-400 flex-wrap">
-            <li><Link href={`/${locale}`} className="hover:text-brand-black">FrameX</Link></li>
-            <li>/</li>
-            <li><Link href={`/${locale}/tin-tuc`} className="hover:text-brand-black">
+          {/* flex-wrap + overflow:hidden keeps breadcrumb from overflowing on mobile
+              when the post title is very long */}
+          <ol className="flex items-center gap-2 text-sm text-brand-gray-400 flex-wrap overflow-hidden">
+            <li className="flex-shrink-0"><Link href={`/${locale}`} className="hover:text-brand-black">FrameX</Link></li>
+            <li className="flex-shrink-0">/</li>
+            <li className="flex-shrink-0"><Link href={`/${locale}/tin-tuc`} className="hover:text-brand-black">
               {locale === 'vi' ? 'Tin tức' : 'Insights'}
             </Link></li>
-            <li>/</li>
-            <li className="text-brand-black line-clamp-1">{tField(post as never, 'title', locale)}</li>
+            <li className="flex-shrink-0">/</li>
+            <li
+              className="text-brand-black line-clamp-1"
+              style={{ overflow: 'hidden', textOverflow: 'ellipsis', minWidth: 0, flex: '1 1 0' }}
+            >{tField(post as never, 'title', locale)}</li>
           </ol>
         </div>
       </nav>

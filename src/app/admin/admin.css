@@ -87,7 +87,14 @@
 .admin-topbar-title { font-size: 18px; font-weight: 600; }
 .admin-topbar-actions { display: flex; align-items: center; gap: 12px; }
 
-.admin-content { padding: 32px; flex: 1; }
+.admin-content {
+  padding: 32px;
+  flex: 1;
+  /* Prevent wide tables / editors from pushing content beyond the sidebar */
+  overflow-x: hidden;
+  /* Ensure the content area is a proper containing block for child widths */
+  min-width: 0;
+}
 
 /* ── Cards / Stats ────────────────────────────────────── */
 .admin-card {
@@ -155,7 +162,15 @@
   box-shadow: 0 0 0 3px rgba(59,130,246,.15);
 }
 .form-textarea { min-height: 90px; resize: vertical; overflow-x: hidden; }
-.form-hint { font-size: 12px; color: #6b7280; margin-top: 4px; }
+.form-hint {
+  font-size: 12px; color: #6b7280; margin-top: 4px;
+  /* prevent very long slug/URL hints from expanding their container */
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 100%;
+  display: block;
+}
 .form-error { font-size: 12px; color: #dc2626; margin-top: 4px; }
 
 /* ── Bilingual editor grid ─────────────────────────────── */
@@ -163,6 +178,11 @@
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 24px;
+}
+/* Collapse to single column on tablets (769-1023px) so the rich editor
+   doesn't get squashed on medium-width admin panels */
+@media (max-width: 1023px) and (min-width: 769px) {
+  .bilingual-grid { grid-template-columns: 1fr; }
 }
 /* CRITICAL: grid children must have min-width:0 or they won't shrink below
    their content width, causing overflow with long unbroken strings */
@@ -203,6 +223,9 @@
   max-width: 320px;
   overflow: hidden;
   text-overflow: ellipsis;
+  /* white-space:nowrap makes ellipsis kick in; break-word is the fallback for
+     browsers that don't honour max-width+overflow on table cells */
+  white-space: nowrap;
   word-break: break-word;
   overflow-wrap: anywhere;
 }
@@ -350,6 +373,6 @@
   .admin-stat-grid { grid-template-columns: 1fr 1fr; }
   /* on mobile the admin table title column must clamp to avoid pushing actions off-screen */
   .admin-table td { max-width: 180px; }
-  .admin-content { padding: 16px; }
+  .admin-content { padding: 16px; overflow-x: hidden; }
   .tab-btn { padding: 8px 12px; font-size: 13px; }
 }
