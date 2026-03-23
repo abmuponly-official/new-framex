@@ -34,35 +34,8 @@ export default async function GuidedQuestion({ locale }: Props) {
       aria-label="Guided question"
       style={{ background: 'var(--gradient-section)' }}
     >
-      {/* ── CSS: keyframes + hover states ── */}
+      {/* ── CSS: hover-only interactions (reveal classes live in globals.css) ── */}
       <style>{`
-        /* Reveal keyframe used by IntersectionObserver scroll system */
-        /* .reveal + .in-view defined in globals.css — we just tune delays here */
-
-        /* Question heading uses a deeper fade-up */
-        .guided-q-reveal {
-          opacity: 0;
-          transform: translateY(22px);
-          transition: opacity 1s cubic-bezier(0.16,1,0.3,1),
-                      transform 1s cubic-bezier(0.16,1,0.3,1);
-        }
-        .guided-q-reveal.in-view {
-          opacity: 1;
-          transform: translateY(0);
-        }
-
-        /* Cards slide up from a smaller offset */
-        .guided-card-reveal {
-          opacity: 0;
-          transform: translateY(12px);
-          transition: opacity 0.9s cubic-bezier(0.16,1,0.3,1),
-                      transform 0.9s cubic-bezier(0.16,1,0.3,1);
-        }
-        .guided-card-reveal.in-view {
-          opacity: 1;
-          transform: translateY(0);
-        }
-
         /* Hover interactions */
         .guided-choice {
           transition: border-color 0.45s ease, background 0.45s ease;
@@ -145,7 +118,7 @@ export default async function GuidedQuestion({ locale }: Props) {
 
           {/* ── Question — centrepiece, heavier reveal ── */}
           <h2
-            className="guided-q-reveal reveal"
+            className="guided-q-reveal"
             style={{
               fontFamily: 'Montserrat, sans-serif',
               fontWeight: 500,
@@ -175,7 +148,7 @@ export default async function GuidedQuestion({ locale }: Props) {
               <Link
                 key={c.num}
                 href={c.href}
-                className="guided-choice guided-card-reveal reveal"
+                className="guided-choice guided-card-reveal"
                 style={{
                   display: 'flex',
                   alignItems: 'center',

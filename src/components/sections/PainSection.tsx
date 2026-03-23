@@ -38,21 +38,9 @@ export default async function PainSection({ locale }: Props) {
       style={{ background: 'var(--gradient-section)' }}
     >
       <style>{`
-        /* Card hover */
+        /* Card hover only — reveal classes live in globals.css */
         .pain-card { transition: background 0.45s ease; }
         .pain-card:hover { background: rgba(58,58,58,0.72) !important; }
-
-        /* Card reveal — smaller travel for a grounded feel */
-        .pain-card-reveal {
-          opacity: 0;
-          transform: translateY(10px);
-          transition: opacity 0.95s cubic-bezier(0.16,1,0.3,1),
-                      transform 0.95s cubic-bezier(0.16,1,0.3,1);
-        }
-        .pain-card-reveal.in-view {
-          opacity: 1;
-          transform: translateY(0);
-        }
       `}</style>
 
       {/* Subtle noise texture */}
@@ -142,7 +130,7 @@ export default async function PainSection({ locale }: Props) {
           {pains.map((pain, i) => (
             <div
               key={i}
-              className="pain-card pain-card-reveal reveal p-8"
+              className="pain-card pain-card-reveal p-8"
               style={{
                 background: 'rgba(42,42,42,0.62)',
                 backdropFilter: 'blur(2px)',
