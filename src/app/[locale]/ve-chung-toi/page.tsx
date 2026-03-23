@@ -17,6 +17,12 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       canonical: `/${locale}/ve-chung-toi`,
       languages: { vi: '/vi/ve-chung-toi', en: '/en/ve-chung-toi' },
     },
+    openGraph: {
+      title: t('headline'),
+      description: t('sub'),
+      url: `https://framex.vn/${locale}/ve-chung-toi`,
+      images: [{ url: 'https://framex.vn/images/og-default.png', width: 1200, height: 630, alt: 'FrameX' }],
+    },
   };
 }
 

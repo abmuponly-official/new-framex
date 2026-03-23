@@ -14,10 +14,17 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     title: t('headline'),
     description: t('sub'),
     alternates: {
+      canonical: `/${locale}/giai-phap-3-trong-1`,
       languages: {
         vi: '/vi/giai-phap-3-trong-1',
         en: '/en/giai-phap-3-trong-1',
       },
+    },
+    openGraph: {
+      title: t('headline'),
+      description: t('sub'),
+      url: `https://framex.vn/${locale}/giai-phap-3-trong-1`,
+      images: [{ url: 'https://framex.vn/images/og-default.png', width: 1200, height: 630, alt: 'FrameX' }],
     },
   };
 }

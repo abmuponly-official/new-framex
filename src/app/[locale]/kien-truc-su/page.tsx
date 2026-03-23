@@ -12,7 +12,16 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return {
     title: t('headline'),
     description: t('sub'),
-    alternates: { languages: { vi: '/vi/kien-truc-su', en: '/en/kien-truc-su' } },
+    alternates: {
+      canonical: `/${locale}/kien-truc-su`,
+      languages: { vi: '/vi/kien-truc-su', en: '/en/kien-truc-su' },
+    },
+    openGraph: {
+      title: t('headline'),
+      description: t('sub'),
+      url: `https://framex.vn/${locale}/kien-truc-su`,
+      images: [{ url: 'https://framex.vn/images/og-default.png', width: 1200, height: 630, alt: 'FrameX' }],
+    },
   };
 }
 

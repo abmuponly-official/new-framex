@@ -80,17 +80,33 @@ export default async function ProjectDetailPage({ params }: Props) {
     description: tField(project as never, 'excerpt', locale),
     image: project.cover_image,
     datePublished: project.published_at,
-    author: { '@type': 'Organization', name: 'FrameX' },
+    author: { '@type': 'Organization', name: 'FrameX', url: 'https://framex.vn' },
     publisher: {
       '@type': 'Organization',
       name: 'FrameX',
       url: 'https://framex.vn',
     },
+    url: `https://framex.vn/${locale}/du-an/${project.slug}`,
+    mainEntityOfPage: {
+      '@type': 'WebPage',
+      '@id': `https://framex.vn/${locale}/du-an/${project.slug}`,
+    },
+  };
+
+  const breadcrumbSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'FrameX', item: `https://framex.vn/${locale}` },
+      { '@type': 'ListItem', position: 2, name: locale === 'vi' ? 'Dự án' : 'Projects', item: `https://framex.vn/${locale}/du-an` },
+      { '@type': 'ListItem', position: 3, name: tField(project as never, 'title', locale), item: `https://framex.vn/${locale}/du-an/${project.slug}` },
+    ],
   };
 
   return (
     <>
       <JsonLd data={articleSchema} />
+      <JsonLd data={breadcrumbSchema} />
 
       {/* Breadcrumb */}
       <nav className="pt-24 pb-3 bg-brand-white border-b border-brand-gray-100" aria-label="Breadcrumb">

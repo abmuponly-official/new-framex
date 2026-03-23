@@ -17,6 +17,12 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       canonical: `/${locale}/lien-he`,
       languages: { vi: '/vi/lien-he', en: '/en/lien-he' },
     },
+    openGraph: {
+      title: t('headline'),
+      description: t('sub'),
+      url: `https://framex.vn/${locale}/lien-he`,
+      images: [{ url: 'https://framex.vn/images/og-default.png', width: 1200, height: 630, alt: 'FrameX' }],
+    },
   };
 }
 

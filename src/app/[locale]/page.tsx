@@ -29,6 +29,16 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       canonical: `/${locale}`,
       languages: { vi: '/vi', en: '/en' },
     },
+    openGraph: {
+      title: isVI
+        ? 'FrameX — Giải pháp 3-trong-1 cho phần khung và vỏ công trình'
+        : 'FrameX — 3-in-1 Solution for Building Frame & Envelope',
+      description: isVI
+        ? 'FrameX tích hợp kết cấu thép tiền chế, cách nhiệt hiệu suất cao và chống thấm toàn diện. 1 đầu mối, 1 tiến độ, 1 bộ bản vẽ đồng bộ.'
+        : 'FrameX integrates pre-engineered steel, high-performance insulation and comprehensive waterproofing. 1 contact, 1 schedule, 1 synchronized drawing set.',
+      url: `https://framex.vn/${locale}`,
+      images: [{ url: 'https://framex.vn/images/og-default.png', width: 1200, height: 630, alt: 'FrameX' }],
+    },
   };
 }
 
@@ -77,8 +87,25 @@ export default async function HomePage({ params }: Props) {
     },
   };
 
+  const websiteSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'WebSite',
+    name: 'FrameX',
+    url: 'https://framex.vn',
+    inLanguage: [locale === 'vi' ? 'vi' : 'en', locale === 'vi' ? 'en' : 'vi'],
+    potentialAction: {
+      '@type': 'SearchAction',
+      target: {
+        '@type': 'EntryPoint',
+        urlTemplate: `https://framex.vn/${locale}/du-an?q={search_term_string}`,
+      },
+      'query-input': 'required name=search_term_string',
+    },
+  };
+
   return (
     <>
+      <JsonLd data={websiteSchema} />
       <JsonLd data={localBusinessSchema} />
 
       {/* 1. Hero — Zen landing */}

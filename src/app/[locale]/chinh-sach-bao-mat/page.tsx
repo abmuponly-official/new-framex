@@ -14,6 +14,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       canonical: `/${locale}/chinh-sach-bao-mat`,
       languages: { vi: '/vi/chinh-sach-bao-mat', en: '/en/chinh-sach-bao-mat' },
     },
+    openGraph: {
+      title: t('title'),
+      url: `https://framex.vn/${locale}/chinh-sach-bao-mat`,
+      images: [{ url: 'https://framex.vn/images/og-default.png', width: 1200, height: 630, alt: 'FrameX' }],
+    },
   };
 }
 

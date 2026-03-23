@@ -27,6 +27,12 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       canonical: `/${locale}/tin-tuc`,
       languages: { vi: '/vi/tin-tuc', en: '/en/tin-tuc' },
     },
+    openGraph: {
+      title: t('headline'),
+      description: t('sub'),
+      url: `https://framex.vn/${locale}/tin-tuc`,
+      images: [{ url: 'https://framex.vn/images/og-default.png', width: 1200, height: 630, alt: 'FrameX' }],
+    },
   };
 }
 

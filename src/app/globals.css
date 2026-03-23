@@ -524,3 +524,26 @@ body {
   margin: 0;
   padding: 0;
 }
+
+/* ─── Print styles — content-first, no nav/CTA overhead ─────────────────── */
+@media print {
+  .skip-to-content,
+  header, nav, footer,
+  .btn-primary, .btn-outline-white, .btn-outline-dark,
+  [aria-label="Site footer"] {
+    display: none !important;
+  }
+  body {
+    background: #fff !important;
+    color: #000 !important;
+  }
+  .prose-framex img {
+    page-break-inside: avoid;
+  }
+  a::after {
+    content: ' (' attr(href) ')';
+    font-size: 0.75em;
+    color: #666;
+  }
+}
+

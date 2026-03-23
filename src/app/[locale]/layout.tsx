@@ -48,7 +48,13 @@ export async function generateMetadata({
       alternateLocale: locale === 'vi' ? ['en_US'] : ['vi_VN'],
       type: 'website',
       siteName: 'FrameX',
+      images: [{ url: 'https://framex.vn/images/og-default.png', width: 1200, height: 630, alt: 'FrameX' }],
     },
+    twitter: {
+      card: 'summary_large_image',
+      site: '@framexvn',
+    },
+    metadataBase: new URL('https://framex.vn'),
   };
 }
 
@@ -65,13 +71,17 @@ export default async function LocaleLayout({ children, params }: Props) {
   return (
     <html lang={locale} suppressHydrationWarning>
       <head>
+        {/* DNS prefetch for external resources */}
+        <link rel="dns-prefetch" href="https://fonts.googleapis.com" />
+        <link rel="dns-prefetch" href="https://fonts.gstatic.com" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link
           rel="preconnect"
           href="https://fonts.gstatic.com"
           crossOrigin="anonymous"
         />
-        {/* Montserrat — display headings | Inter — body copy */}
+        {/* Montserrat — display headings | Inter — body copy
+            display=swap prevents invisible text during font load (FOIT) */}
         <link
           rel="preload"
           as="style"
@@ -81,6 +91,10 @@ export default async function LocaleLayout({ children, params }: Props) {
           href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800&family=Inter:wght@400;500;600&display=swap"
           rel="stylesheet"
         />
+        {/* Favicon */}
+        <link rel="icon" href="/favicon.ico" sizes="any" />
+        <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+        <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
       </head>
       <body className="bg-brand-white text-brand-black font-sans antialiased" style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>
         <NextIntlClientProvider messages={messages}>

@@ -83,17 +83,33 @@ export default async function BlogDetailPage({ params }: Props) {
     image: post.cover_image,
     datePublished: post.published_at,
     dateModified: post.updated_at,
-    author: { '@type': 'Organization', name: 'FrameX' },
+    author: { '@type': 'Organization', name: 'FrameX', url: 'https://framex.vn' },
     publisher: {
       '@type': 'Organization',
       name: 'FrameX',
       logo: { '@type': 'ImageObject', url: 'https://framex.vn/images/logo.png' },
     },
+    url: `https://framex.vn/${locale}/tin-tuc/${post.slug}`,
+    mainEntityOfPage: {
+      '@type': 'WebPage',
+      '@id': `https://framex.vn/${locale}/tin-tuc/${post.slug}`,
+    },
+  };
+
+  const breadcrumbSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'FrameX', item: `https://framex.vn/${locale}` },
+      { '@type': 'ListItem', position: 2, name: locale === 'vi' ? 'Tin tức' : 'Insights', item: `https://framex.vn/${locale}/tin-tuc` },
+      { '@type': 'ListItem', position: 3, name: tField(post as never, 'title', locale), item: `https://framex.vn/${locale}/tin-tuc/${post.slug}` },
+    ],
   };
 
   return (
     <>
       <JsonLd data={articleSchema} />
+      <JsonLd data={breadcrumbSchema} />
 
       <nav className="pt-24 pb-3 bg-brand-white border-b border-brand-gray-100" aria-label="Breadcrumb">
         <div className="container-base">

@@ -12,7 +12,16 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return {
     title: t('headline'),
     description: t('sub'),
-    alternates: { languages: { vi: '/vi/chu-dau-tu', en: '/en/chu-dau-tu' } },
+    alternates: {
+      canonical: `/${locale}/chu-dau-tu`,
+      languages: { vi: '/vi/chu-dau-tu', en: '/en/chu-dau-tu' },
+    },
+    openGraph: {
+      title: t('headline'),
+      description: t('sub'),
+      url: `https://framex.vn/${locale}/chu-dau-tu`,
+      images: [{ url: 'https://framex.vn/images/og-default.png', width: 1200, height: 630, alt: 'FrameX' }],
+    },
   };
 }
 

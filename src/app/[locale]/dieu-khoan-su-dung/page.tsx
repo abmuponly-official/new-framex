@@ -14,6 +14,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       canonical: `/${locale}/dieu-khoan-su-dung`,
       languages: { vi: '/vi/dieu-khoan-su-dung', en: '/en/dieu-khoan-su-dung' },
     },
+    openGraph: {
+      title: t('title'),
+      url: `https://framex.vn/${locale}/dieu-khoan-su-dung`,
+      images: [{ url: 'https://framex.vn/images/og-default.png', width: 1200, height: 630, alt: 'FrameX' }],
+    },
   };
 }
 

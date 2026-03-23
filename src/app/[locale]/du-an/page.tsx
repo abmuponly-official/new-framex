@@ -27,6 +27,12 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       canonical: `/${locale}/du-an`,
       languages: { vi: '/vi/du-an', en: '/en/du-an' },
     },
+    openGraph: {
+      title: t('headline'),
+      description: t('sub'),
+      url: `https://framex.vn/${locale}/du-an`,
+      images: [{ url: 'https://framex.vn/images/og-default.png', width: 1200, height: 630, alt: 'FrameX' }],
+    },
   };
 }
 
