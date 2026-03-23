@@ -10,11 +10,6 @@ const nextConfig = {
         protocol: 'https',
         hostname: '*.supabase.co',
       },
-      // Allow next/image to optimize production domain images
-      {
-        protocol: 'https',
-        hostname: 'framex.vn',
-      },
     ],
   },
   async headers() {

@@ -43,7 +43,7 @@ export default async function HomePage({ params }: Props) {
     description:
       'Giải pháp 3-trong-1 cho phần khung và vỏ công trình: kết cấu thép tiền chế, cách nhiệt hiệu suất cao và chống thấm toàn diện.',
     url: 'https://framex.vn',
-    image: 'https://framex.vn/og-default.png',
+    logo: 'https://framex.vn/images/logo.png',
     serviceArea: { '@type': 'Country', name: 'Vietnam' },
     hasOfferCatalog: {
       '@type': 'OfferCatalog',

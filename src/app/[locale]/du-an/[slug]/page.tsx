@@ -7,7 +7,6 @@ import { createClient } from '@/lib/supabase/server';
 import { t as tField } from '@/types/content';
 import type { Project } from '@/types/content';
 import JsonLd from '@/components/seo/JsonLd';
-import Image from 'next/image';
 
 type Props = { params: { locale: string; slug: string } };
 
@@ -143,13 +142,12 @@ export default async function ProjectDetailPage({ params }: Props) {
       {project.cover_image && (
         <div className="bg-brand-gray-50">
           <div className="container-base py-0">
-            <Image
+            <img
               src={project.cover_image}
               alt={tField(project as never, 'title', locale)}
-              width={1200}
-              height={675}
               className="w-full aspect-[16/9] object-cover"
-              priority
+              loading="eager"
+              decoding="async"
             />
           </div>
         </div>
@@ -174,12 +172,11 @@ export default async function ProjectDetailPage({ params }: Props) {
             <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
               {project.gallery.map((item, i) => (
                 <figure key={i}>
-                  <Image
+                  <img
                     src={item.url}
                     alt={locale === 'vi' ? item.caption_vi : item.caption_en}
-                    width={800}
-                    height={600}
                     className="w-full aspect-[4/3] object-cover rounded-sm"
+                    loading="lazy"
                   />
                   {(item.caption_vi || item.caption_en) && (
                     <figcaption className="text-xs text-brand-gray-400 mt-2">

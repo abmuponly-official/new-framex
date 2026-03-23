@@ -8,7 +8,6 @@ import { t as tField } from '@/types/content';
 import type { Post, PostCategory } from '@/types/content';
 import FilterBar from '@/components/ui/FilterBar';
 import Pagination from '@/components/ui/Pagination';
-import Image from 'next/image';
 
 const PAGE_SIZE = 6;
 
@@ -271,13 +270,18 @@ function PostCard({
         }}
       >
         {post.cover_image ? (
-          <Image
+          <img
             src={post.cover_image}
             alt={title}
-            fill
-            style={{ objectFit: 'cover', display: 'block', transition: 'transform 0.7s ease' }}
+            style={{
+              width: '100%',
+              height: '100%',
+              objectFit: 'cover',
+              display: 'block',
+              transition: 'transform 0.7s ease',
+            }}
             className="group-hover:scale-105"
-            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+            loading="lazy"
           />
         ) : (
           /* Consistent placeholder — same height as a 16/9 image would be */
