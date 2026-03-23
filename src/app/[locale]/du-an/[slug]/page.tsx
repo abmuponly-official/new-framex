@@ -78,7 +78,7 @@ export default async function ProjectDetailPage({ params }: Props) {
             <li>/</li>
             <li><Link href={`/${locale}/du-an`} className="hover:text-brand-black">{t('headline').split('.')[0]}</Link></li>
             <li>/</li>
-            <li className="text-brand-black">{tField(project as never, 'title', locale)}</li>
+            <li className="text-brand-black line-clamp-1" style={{ overflow: 'hidden', textOverflow: 'ellipsis', minWidth: 0, flex: '1 1 0' }}>{tField(project as never, 'title', locale)}</li>
           </ol>
         </div>
       </nav>
@@ -98,10 +98,10 @@ export default async function ProjectDetailPage({ params }: Props) {
               </span>
             )}
           </div>
-          <h1 className="text-display-md font-semibold text-brand-black mb-4">
+          <h1 className="text-display-md font-semibold text-brand-black mb-4" style={{ overflowWrap: 'break-word', wordBreak: 'break-word' }}>
             {tField(project as never, 'title', locale)}
           </h1>
-          <p className="text-lg text-brand-gray-500">
+          <p className="text-lg text-brand-gray-500" style={{ overflowWrap: 'break-word' }}>
             {tField(project as never, 'excerpt', locale)}
           </p>
 

@@ -123,12 +123,14 @@ export default async function BlogPage({ params }: Props) {
 
                   {/* Title */}
                   <h2
-                    className="font-semibold mb-2 transition-colors"
+                    className="font-semibold mb-2 transition-colors line-clamp-2"
                     style={{
                       fontFamily: 'Montserrat, sans-serif',
                       fontSize: '0.9375rem',
                       color: '#FFFFFF',
                       lineHeight: '1.35',
+                      overflowWrap: 'break-word',
+                      wordBreak: 'break-word',
                     }}
                   >
                     {tField(post as never, 'title', locale)}

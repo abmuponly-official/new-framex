@@ -73,7 +73,7 @@ export default async function BlogDetailPage({ params }: Props) {
 
       <nav className="pt-24 pb-4 bg-brand-white border-b border-brand-gray-100" aria-label="Breadcrumb">
         <div className="container-base">
-          <ol className="flex items-center gap-2 text-sm text-brand-gray-400">
+          <ol className="flex items-center gap-2 text-sm text-brand-gray-400 flex-wrap">
             <li><Link href={`/${locale}`} className="hover:text-brand-black">FrameX</Link></li>
             <li>/</li>
             <li><Link href={`/${locale}/tin-tuc`} className="hover:text-brand-black">
@@ -92,10 +92,10 @@ export default async function BlogDetailPage({ params }: Props) {
               {post.category}
             </p>
           )}
-          <h1 className="text-display-md font-semibold text-brand-black mb-4">
+          <h1 className="text-display-md font-semibold text-brand-black mb-4" style={{ overflowWrap: 'break-word', wordBreak: 'break-word' }}>
             {tField(post as never, 'title', locale)}
           </h1>
-          <p className="text-lg text-brand-gray-500 mb-8">
+          <p className="text-lg text-brand-gray-500 mb-8" style={{ overflowWrap: 'break-word' }}>
             {tField(post as never, 'excerpt', locale)}
           </p>
 

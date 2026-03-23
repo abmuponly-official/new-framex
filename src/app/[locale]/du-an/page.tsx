@@ -154,12 +154,14 @@ export default async function ProjectsPage({ params }: Props) {
 
                   {/* Title & excerpt */}
                   <h2
-                    className="font-semibold mb-1 transition-colors"
+                    className="font-semibold mb-1 transition-colors line-clamp-2"
                     style={{
                       fontFamily: 'Montserrat, sans-serif',
                       fontSize: '0.9375rem',
                       color: '#FFFFFF',
                       lineHeight: '1.3',
+                      overflowWrap: 'break-word',
+                      wordBreak: 'break-word',
                     }}
                   >
                     {tField(project as never, 'title', locale)}

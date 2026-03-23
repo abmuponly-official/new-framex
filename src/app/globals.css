@@ -187,18 +187,26 @@ body {
   .prose-framex {
     @apply leading-relaxed;
     color: #3A3A3A;
+    /* prevent any long unbroken string (URL, slug, code) from overflowing */
+    overflow-wrap: anywhere;
+    word-break: break-word;
+    /* clamp the prose container so it never widens its parent */
+    max-width: 100%;
+    overflow-x: hidden;
   }
   .prose-framex h2 {
     font-family: var(--font-display);
     @apply text-2xl font-bold mt-12 mb-4;
     color: var(--color-charcoal);
+    overflow-wrap: break-word;
   }
   .prose-framex h3 {
     font-family: var(--font-display);
     @apply text-xl font-semibold mt-8 mb-3;
     color: var(--color-charcoal);
+    overflow-wrap: break-word;
   }
-  .prose-framex p     { @apply mb-5; }
+  .prose-framex p     { @apply mb-5; overflow-wrap: anywhere; }
   .prose-framex ul    { @apply list-disc pl-6 mb-5 space-y-2; }
   .prose-framex strong {
     font-weight: 700;
@@ -208,6 +216,37 @@ body {
     border-left: 3px solid var(--color-orange);
     @apply pl-6 italic my-8;
     color: var(--color-concrete);
+  }
+  /* Rich-text images and tables must never exceed their container */
+  .prose-framex img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+  }
+  .prose-framex table {
+    width: 100%;
+    max-width: 100%;
+    display: block;
+    overflow-x: auto;
+    border-collapse: collapse;
+  }
+  .prose-framex td,
+  .prose-framex th {
+    padding: 8px 12px;
+    border: 1px solid #e5e7eb;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+  }
+  /* Inline code / pre blocks */
+  .prose-framex pre {
+    overflow-x: auto;
+    max-width: 100%;
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+  .prose-framex code {
+    word-break: break-all;
+    overflow-wrap: anywhere;
   }
 
   /* Brand button variants */

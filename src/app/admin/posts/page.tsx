@@ -74,8 +74,8 @@ export default async function AdminPostsPage({
               {posts?.length ? posts.map((p: Post) => (
                 <tr key={p.id}>
                   <td>
-                    <div style={{ fontWeight: 500 }}>{p.title_vi || '(chưa có tiêu đề)'}</div>
-                    <div style={{ fontSize: 12, color: '#9ca3af' }}>{p.slug}</div>
+                    <div style={{ fontWeight: 500, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: 260 }}>{p.title_vi || '(chưa có tiêu đề)'}</div>
+                    <div style={{ fontSize: 12, color: '#9ca3af', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: 260 }}>{p.slug}</div>
                   </td>
                   <td>{p.category ?? '—'}</td>
                   <td>

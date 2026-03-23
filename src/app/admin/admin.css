@@ -144,12 +144,17 @@
   background: #fff; color: #111827;
   transition: border .15s, box-shadow .15s;
   font-family: inherit;
+  /* prevent inputs from overflowing their container */
+  box-sizing: border-box;
+  min-width: 0;
+  word-break: break-word;
+  overflow-wrap: anywhere;
 }
 .form-input:focus, .form-textarea:focus, .form-select:focus {
   outline: none; border-color: #3b82f6;
   box-shadow: 0 0 0 3px rgba(59,130,246,.15);
 }
-.form-textarea { min-height: 90px; resize: vertical; }
+.form-textarea { min-height: 90px; resize: vertical; overflow-x: hidden; }
 .form-hint { font-size: 12px; color: #6b7280; margin-top: 4px; }
 .form-error { font-size: 12px; color: #dc2626; margin-top: 4px; }
 
@@ -159,6 +164,9 @@
   grid-template-columns: 1fr 1fr;
   gap: 24px;
 }
+/* CRITICAL: grid children must have min-width:0 or they won't shrink below
+   their content width, causing overflow with long unbroken strings */
+.bilingual-grid > * { min-width: 0; }
 .bilingual-col-header {
   display: flex; align-items: center; gap: 8px;
   font-size: 12px; font-weight: 600; text-transform: uppercase;
@@ -191,6 +199,12 @@
 .admin-table td {
   padding: 12px 14px; border-bottom: 1px solid #f3f4f6;
   vertical-align: middle;
+  /* prevent very long cell content from blowing out column widths */
+  max-width: 320px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  word-break: break-word;
+  overflow-wrap: anywhere;
 }
 .admin-table tr:hover td { background: #f9fafb; }
 .admin-table .actions { display: flex; gap: 6px; }
@@ -212,6 +226,11 @@
   min-height: 200px; border: 1px solid #d1d5db; border-radius: 7px;
   padding: 12px; font-size: 14px; line-height: 1.6;
   background: #fff; outline: none;
+  /* prevent long URLs / unbroken strings from overflowing the editor */
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  overflow-x: hidden;
+  max-width: 100%;
 }
 .rich-editor:focus { border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59,130,246,.15); }
 .editor-toolbar {
@@ -259,6 +278,11 @@
   background: #fff; border-radius: 12px; padding: 32px;
   width: 100%; max-width: 480px;
   box-shadow: 0 25px 50px rgba(0,0,0,.25);
+  /* prevent long content (e.g. long filenames or notes) from overflowing modal */
+  overflow-y: auto;
+  max-height: 90vh;
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 .modal-title { font-size: 18px; font-weight: 700; margin-bottom: 12px; }
 .modal-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 24px; }
@@ -267,6 +291,8 @@
 .tab-bar {
   display: flex; gap: 2px; border-bottom: 2px solid #e5e7eb;
   margin-bottom: 24px;
+  /* allow tabs to wrap on very narrow admin panels */
+  flex-wrap: wrap;
 }
 .tab-btn {
   padding: 10px 20px; font-size: 14px; font-weight: 500;
@@ -322,4 +348,8 @@
   .admin-main { margin-left: 0; }
   .bilingual-grid { grid-template-columns: 1fr; }
   .admin-stat-grid { grid-template-columns: 1fr 1fr; }
+  /* on mobile the admin table title column must clamp to avoid pushing actions off-screen */
+  .admin-table td { max-width: 180px; }
+  .admin-content { padding: 16px; }
+  .tab-btn { padding: 8px 12px; font-size: 13px; }
 }
