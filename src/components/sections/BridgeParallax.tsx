@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
+import { usePathname } from 'next/navigation';
 
 /*
  * BridgeParallax — subtle background image parallax for BridgeSection.
@@ -21,6 +22,7 @@ const IDLE_DELAY = 120;  // ms before will-change is released after scroll stops
 
 export default function BridgeParallax() {
   const bgRef = useRef<HTMLDivElement>(null);
+  const pathname = usePathname();
 
   useEffect(() => {
     const el = bgRef.current;
@@ -74,7 +76,10 @@ export default function BridgeParallax() {
       clearTimeout(idleTimer);
       el.classList.remove('is-scrolling');
     };
-  }, []);
+  // Re-run when the route changes so the scroll listener is re-attached
+  // after returning to the homepage via back/logo navigation.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pathname]);
 
   return (
     <>

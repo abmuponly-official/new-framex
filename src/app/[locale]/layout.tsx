@@ -6,6 +6,7 @@ import { locales, type Locale } from '@/lib/i18n/request';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import ScrollReveal from '@/components/ui/ScrollReveal';
+import RouteChangeHandler from '@/components/ui/RouteChangeHandler';
 
 type Props = {
   children: React.ReactNode;
@@ -106,6 +107,7 @@ export default async function LocaleLayout({ children, params }: Props) {
           <main id="main-content">{children}</main>
           <Footer locale={locale} />
           <ScrollReveal />
+          <RouteChangeHandler />
         </NextIntlClientProvider>
       </body>
     </html>

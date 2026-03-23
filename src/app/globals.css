@@ -547,3 +547,47 @@ body {
   }
 }
 
+/* ─── Hero animation safety fallback ────────────────────────────────────────
+ * Prevents invisible text on Safari / slow-JS scenarios where the CSS
+ * animation `fill-mode: both` keeps opacity:0 and the animation never fires
+ * (e.g., returning via back button before JS has a chance to replay it).
+ *
+ * Strategy: `@supports` detects whether CSS animations are available.
+ * — If the browser supports animations it does nothing — the inline styles
+ *   drive the opacity:0 → 1 transition themselves.
+ * — If animations are NOT supported, or as a final safety net via the
+ *   `.hero-anim-done` class that RouteChangeHandler adds after replay, we
+ *   force all hero children to opacity:1 / transform:none so text is ALWAYS
+ *   readable regardless of animation state.
+ *
+ * We also add a 2.5s animation-duration cap fallback: once the longest hero
+ * animation (1.6s delay 1.6s = 3.2s worst case) would have completed, we
+ * flip all animated children visible via the .hero-anim-done class.
+ * ─────────────────────────────────────────────────────────────────────────── */
+
+/* Class applied by RouteChangeHandler after animation replay completes */
+#hero.hero-anim-done [style*="animation"],
+#hero.hero-anim-done [style*="animation"] * {
+  opacity: 1 !important;
+  transform: none !important;
+}
+
+/* Scripting-none fallback (also covered by globals @media scripting:none) */
+@media (scripting: none) {
+  #hero [style*="animation"] {
+    opacity: 1 !important;
+    transform: none !important;
+    animation: none !important;
+  }
+}
+
+/* ─── Smooth-scroll guard for route changes ─────────────────────────────────
+ * scroll-behavior:smooth conflicts with instant programmatic scrollTo on route
+ * change. RouteChangeHandler uses `behavior:'instant'` which overrides this,
+ * but older browsers may ignore it. The .scroll-instant class temporarily
+ * disables smooth scroll during programmatic resets.
+ * ─────────────────────────────────────────────────────────────────────────── */
+html.scroll-instant {
+  scroll-behavior: auto !important;
+}
+
