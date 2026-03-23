@@ -21,6 +21,8 @@ export const SETTINGS_KEYS = {
   FACEBOOK_URL:   'facebook_url',
   ZALO_URL:       'zalo_url',
   YOUTUBE_URL:    'youtube_url',
+  WAREHOUSE_URL:  'warehouse_url',
+  PINTEREST_URL:  'pinterest_url',
 } as const;
 
 /** Fallback values – used when Supabase is unreachable or table is empty */
@@ -32,6 +34,8 @@ const FALLBACK: SettingsMap = {
   facebook_url:   { vi: '', en: '' },
   zalo_url:       { vi: '', en: '' },
   youtube_url:    { vi: '', en: '' },
+  warehouse_url:  { vi: '', en: '' },
+  pinterest_url:  { vi: '', en: '' },
 };
 
 async function _fetchSettings(): Promise<SettingsMap> {

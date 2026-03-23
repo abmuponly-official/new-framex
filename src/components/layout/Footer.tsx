@@ -15,7 +15,43 @@ export default async function Footer({ locale }: Props) {
   const email   = getSetting(settings, 'contact_email',  locale);
   const phone   = getSetting(settings, 'contact_phone',  locale);
   const address = getSetting(settings, 'address',        locale);
-  const pdfPath = getSetting(settings, 'capability_pdf', locale);
+  const pdfPath  = getSetting(settings, 'capability_pdf', locale);
+  const ytUrl    = getSetting(settings, 'youtube_url',    locale);
+  const waUrl    = getSetting(settings, 'warehouse_url',  locale);
+  const pinUrl   = getSetting(settings, 'pinterest_url',  locale);
+
+  const socials = [
+    {
+      key: 'yt',
+      href: ytUrl,
+      label: 'YouTube',
+      icon: (
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+          <path d="M23.5 6.2a3.01 3.01 0 0 0-2.12-2.13C19.54 3.6 12 3.6 12 3.6s-7.54 0-9.38.47A3.01 3.01 0 0 0 .5 6.2 31.6 31.6 0 0 0 0 12a31.6 31.6 0 0 0 .5 5.8 3.01 3.01 0 0 0 2.12 2.13C4.46 20.4 12 20.4 12 20.4s7.54 0 9.38-.47a3.01 3.01 0 0 0 2.12-2.13A31.6 31.6 0 0 0 24 12a31.6 31.6 0 0 0-.5-5.8zM9.75 15.52V8.48L15.86 12l-6.11 3.52z"/>
+        </svg>
+      ),
+    },
+    {
+      key: 'wh',
+      href: waUrl,
+      label: '3D Warehouse',
+      icon: (
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+          <path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/>
+        </svg>
+      ),
+    },
+    {
+      key: 'pin',
+      href: pinUrl,
+      label: 'Pinterest',
+      icon: (
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+          <path d="M12 0C5.37 0 0 5.37 0 12c0 5.08 3.16 9.43 7.63 11.18-.11-.94-.2-2.38.04-3.4.22-.92 1.47-6.22 1.47-6.22s-.37-.75-.37-1.86c0-1.74 1.01-3.05 2.27-3.05 1.07 0 1.59.8 1.59 1.77 0 1.08-.69 2.69-1.05 4.19-.3 1.25.62 2.27 1.85 2.27 2.22 0 3.71-2.86 3.71-6.25 0-2.57-1.73-4.37-4.21-4.37-2.87 0-4.55 2.15-4.55 4.37 0 .87.33 1.8.75 2.3a.3.3 0 0 1 .07.29c-.08.31-.25 1-.28 1.14-.04.18-.14.22-.32.13-1.25-.58-2.03-2.42-2.03-3.89 0-3.16 2.3-6.07 6.63-6.07 3.48 0 6.19 2.48 6.19 5.8 0 3.46-2.18 6.24-5.2 6.24-1.02 0-1.97-.53-2.3-1.15l-.62 2.33c-.23.87-.84 1.96-1.25 2.62.94.29 1.94.45 2.97.45 6.63 0 12-5.37 12-12S18.63 0 12 0z"/>
+        </svg>
+      ),
+    },
+  ].filter(s => s.href);
 
   const p = (path: string) => `/${locale}${path}`;
 
@@ -34,6 +70,8 @@ export default async function Footer({ locale }: Props) {
         .footer-contact-link:hover { color: rgba(255,255,255,0.85); }
         .footer-pdf-btn { display: inline-flex; align-items: center; gap: 0.5rem; margin-top: 1.5rem; font-size: 0.75rem; font-weight: 600; padding: 0.5rem 0.75rem; color: #FF6B35; border: 1px solid rgba(255,107,53,0.35); border-radius: 2px; font-family: Inter, sans-serif; letter-spacing: 0.04em; transition: background 0.2s, border-color 0.2s; }
         .footer-pdf-btn:hover { background: rgba(255,107,53,0.08); border-color: rgba(255,107,53,0.6); }
+        .footer-social-btn { display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.4rem 0.65rem; border-radius: 2px; border: 1px solid rgba(255,255,255,0.12); color: rgba(255,255,255,0.45); font-family: Inter, sans-serif; font-size: 0.75rem; transition: border-color 0.2s, color 0.2s; }
+        .footer-social-btn:hover { border-color: rgba(255,107,53,0.5); color: #FF6B35; }
       `}</style>
 
       <div className="container-base py-16 md:py-20">
@@ -158,6 +196,33 @@ export default async function Footer({ locale }: Props) {
               <a href={pdfPath} download className="footer-pdf-btn">
                 ↓ {t('capability')}
               </a>
+            )}
+
+            {/* Social links */}
+            {socials.length > 0 && (
+              <div className="mt-6">
+                <p
+                  className="text-xs uppercase tracking-[0.14em] mb-3 font-semibold"
+                  style={{ color: '#FF6B35', fontFamily: 'Inter, sans-serif' }}
+                >
+                  {t('social_title')}
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  {socials.map(({ key, href, label, icon }) => (
+                    <a
+                      key={key}
+                      href={href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="footer-social-btn"
+                      aria-label={label}
+                    >
+                      {icon}
+                      <span>{label}</span>
+                    </a>
+                  ))}
+                </div>
+              </div>
             )}
           </div>
         </div>

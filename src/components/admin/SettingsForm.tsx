@@ -10,7 +10,9 @@ const SETTING_LABELS: Record<string, { label: string; hint?: string }> = {
   capability_pdf:   { label: 'Hồ sơ năng lực (PDF)', hint: 'File PDF có thể tải lên Supabase Storage hoặc nhập URL thủ công' },
   facebook_url:     { label: 'Facebook URL', hint: '' },
   zalo_url:         { label: 'Zalo URL', hint: '' },
-  youtube_url:      { label: 'YouTube URL', hint: '' },
+  youtube_url:      { label: 'YouTube URL', hint: 'Kênh YouTube của FrameX' },
+  warehouse_url:    { label: '3D Warehouse URL', hint: 'Trang SketchUp 3D Warehouse của FrameX' },
+  pinterest_url:    { label: 'Pinterest URL', hint: 'Trang Pinterest của FrameX' },
 };
 
 export default function SettingsForm({ settings }: { settings: SiteSetting[] }) {
@@ -61,7 +63,7 @@ export default function SettingsForm({ settings }: { settings: SiteSetting[] }) 
       {allKeys.map((key) => {
         const meta = SETTING_LABELS[key];
         const val = values[key] ?? { vi: '', en: '' };
-        const isBilingual = !['facebook_url', 'zalo_url', 'youtube_url', 'capability_pdf'].includes(key);
+        const isBilingual = !['facebook_url', 'zalo_url', 'youtube_url', 'warehouse_url', 'pinterest_url', 'capability_pdf'].includes(key);
 
         return (
           <div key={key} className="admin-card" style={{ marginBottom: 16 }}>
