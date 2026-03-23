@@ -93,7 +93,7 @@ export default async function ProjectDetailPage({ params }: Props) {
       <JsonLd data={articleSchema} />
 
       {/* Breadcrumb */}
-      <nav className="pt-24 pb-4 bg-brand-white border-b border-brand-gray-100" aria-label="Breadcrumb">
+      <nav className="pt-24 pb-3 bg-brand-white border-b border-brand-gray-100" aria-label="Breadcrumb">
         <div className="container-base">
           {/* overflow:hidden on <ol> prevents the flex row from overflowing when
               the last breadcrumb item (project title) is very long */}
@@ -108,45 +108,63 @@ export default async function ProjectDetailPage({ params }: Props) {
       </nav>
 
       {/* Hero */}
-      <section className="py-10 bg-brand-white border-b border-brand-gray-100">
+      <section className="pt-6 pb-5 bg-brand-white border-b border-brand-gray-100">
         <div className="container-base max-w-4xl">
-          <div className="flex flex-wrap gap-2 mb-4">
-            {project.has_watertest && (
-              <span className="text-xs px-2 py-1 bg-brand-gray-100 text-brand-gray-500 rounded-sm">
-                {t('proof_watertest')}
-              </span>
-            )}
-            {project.has_co && (
-              <span className="text-xs px-2 py-1 bg-brand-gray-100 text-brand-gray-500 rounded-sm">
-                {t('proof_co')}
-              </span>
-            )}
-          </div>
-          <h1 className="text-display-md font-semibold text-brand-black mb-4" style={{ overflowWrap: 'break-word', wordBreak: 'break-word' }}>
+
+          {/* Proof chips */}
+          {(project.has_watertest || project.has_co) && (
+            <div className="flex flex-wrap gap-2 mb-3">
+              {project.has_watertest && (
+                <span className="text-xs px-2 py-1 bg-brand-gray-100 text-brand-gray-500 rounded-sm">
+                  {t('proof_watertest')}
+                </span>
+              )}
+              {project.has_co && (
+                <span className="text-xs px-2 py-1 bg-brand-gray-100 text-brand-gray-500 rounded-sm">
+                  {t('proof_co')}
+                </span>
+              )}
+            </div>
+          )}
+
+          {/* Title */}
+          <h1 className="text-display-md font-semibold text-brand-black mb-3 leading-tight" style={{ overflowWrap: 'break-word', wordBreak: 'break-word' }}>
             {tField(project as never, 'title', locale)}
           </h1>
-          <p className="text-lg text-brand-gray-500" style={{ overflowWrap: 'break-word' }}>
+
+          {/* Excerpt */}
+          <p className="text-lg text-brand-gray-500 mb-4 leading-relaxed" style={{ overflowWrap: 'break-word', maxWidth: 'none' }}>
             {tField(project as never, 'excerpt', locale)}
           </p>
 
           {/* Meta info */}
-          <div className="flex flex-wrap gap-4 mt-5 text-sm text-brand-gray-400">
+          <div className="flex flex-wrap gap-3 text-sm text-brand-gray-400">
             {project.client_name && <span>{project.client_name}</span>}
-            {project.location && <span>{project.location}</span>}
-            {project.year && <span>{project.year}</span>}
+            {project.location && (
+              <>
+                {project.client_name && <span aria-hidden>·</span>}
+                <span>{project.location}</span>
+              </>
+            )}
+            {project.year && (
+              <>
+                {(project.client_name || project.location) && <span aria-hidden>·</span>}
+                <span>{project.year}</span>
+              </>
+            )}
           </div>
         </div>
       </section>
 
-      {/* Cover image */}
+      {/* Cover image — full-bleed in a light-gray band */}
       {project.cover_image && (
         <div className="bg-brand-gray-50">
-          <div className="container-base" style={{ paddingTop: 0, paddingBottom: 0 }}>
+          <div className="container-base max-w-4xl" style={{ paddingTop: '1.25rem', paddingBottom: '1.25rem' }}>
             <img
               src={project.cover_image}
               alt={tField(project as never, 'title', locale)}
-              className="w-full"
-              style={{ display: 'block', maxHeight: '520px', objectFit: 'cover' }}
+              className="w-full rounded-sm"
+              style={{ display: 'block', maxHeight: '480px', objectFit: 'cover' }}
               loading="eager"
               decoding="async"
             />
@@ -155,7 +173,7 @@ export default async function ProjectDetailPage({ params }: Props) {
       )}
 
       {/* Content */}
-      <article className="bg-brand-white" style={{ paddingTop: '2.5rem', paddingBottom: '3rem' }}>
+      <article className="bg-brand-white" style={{ paddingTop: '2rem', paddingBottom: '3rem' }}>
         <div className="container-base max-w-3xl">
           <div
             className="prose-framex"
@@ -169,8 +187,11 @@ export default async function ProjectDetailPage({ params }: Props) {
       {/* Gallery */}
       {project.gallery?.length > 0 && (
         <section className="bg-brand-gray-50 border-t border-brand-gray-100" style={{ paddingTop: '2rem', paddingBottom: '2.5rem' }}>
-          <div className="container-base">
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+          <div className="container-base max-w-4xl">
+            <p className="text-xs uppercase tracking-widest text-brand-gray-400 mb-4 font-medium">
+              {locale === 'vi' ? 'Thư viện ảnh' : 'Gallery'}
+            </p>
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
               {project.gallery.map((item, i) => (
                 <figure key={i}>
                   <img
@@ -180,7 +201,7 @@ export default async function ProjectDetailPage({ params }: Props) {
                     loading="lazy"
                   />
                   {(item.caption_vi || item.caption_en) && (
-                    <figcaption className="text-xs text-brand-gray-400 mt-2">
+                    <figcaption className="text-xs text-brand-gray-400 mt-1.5 leading-snug">
                       {locale === 'vi' ? item.caption_vi : item.caption_en}
                     </figcaption>
                   )}
@@ -192,8 +213,8 @@ export default async function ProjectDetailPage({ params }: Props) {
       )}
 
       {/* Back + CTA */}
-      <section className="py-10 bg-brand-white border-t border-brand-gray-100">
-        <div className="container-base flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
+      <section className="py-8 bg-brand-white border-t border-brand-gray-100">
+        <div className="container-base flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <Link
             href={`/${locale}/du-an`}
             className="text-sm text-brand-gray-400 hover:text-brand-black transition-colors"

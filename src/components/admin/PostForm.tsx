@@ -150,6 +150,13 @@ export default function PostForm({ mode, initialData, userId }: Props) {
               folder="posts"
               hint="Tỷ lệ khuyến nghị 16:9 hoặc 2:1, WebP, tối đa 5MB."
             />
+            {coverImage && (
+              <img
+                src={coverImage}
+                alt="Cover preview"
+                className="cover-preview"
+              />
+            )}
           </div>
 
           <div className="form-group">
@@ -246,7 +253,7 @@ function SimpleEditor({ value, onChange, placeholder }: { value: string; onChang
         dangerouslySetInnerHTML={{ __html: value }}
         onInput={(e) => onChange((e.target as HTMLDivElement).innerHTML)}
         data-placeholder={placeholder}
-        style={{ minHeight: 240, maxWidth: '100%', boxSizing: 'border-box' }}
+        style={{ minHeight: 320, maxWidth: '100%', boxSizing: 'border-box' }}
       />
     </div>
   );

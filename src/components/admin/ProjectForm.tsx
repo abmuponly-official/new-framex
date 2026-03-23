@@ -329,6 +329,13 @@ export default function ProjectForm({ mode, initialData, userId }: Props) {
               folder="projects"
               hint="Tỷ lệ khuyến nghị 4:3, WebP, tối đa 5MB. Ảnh này hiển thị trên danh sách dự án."
             />
+            {coverImage && (
+              <img
+                src={coverImage}
+                alt="Cover preview"
+                className="cover-preview"
+              />
+            )}
           </div>
           <MultiImageUploader
             label="Thư viện ảnh dự án (Gallery)"
@@ -405,7 +412,7 @@ function SimpleRichEditor({ value, onChange, placeholder }: {
         dangerouslySetInnerHTML={{ __html: value }}
         onInput={(e) => onChange((e.target as HTMLDivElement).innerHTML)}
         data-placeholder={placeholder}
-        style={{ minHeight: 220, maxWidth: '100%', boxSizing: 'border-box' }}
+        style={{ minHeight: 320, maxWidth: '100%', boxSizing: 'border-box' }}
       />
     </div>
   );

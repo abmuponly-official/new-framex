@@ -248,6 +248,14 @@ body {
     max-width: 100%;
     overflow-x: hidden;
   }
+  /* First child inside prose should not have top margin — avoids double-gap
+     between the cover image / meta row and the first heading/paragraph */
+  .prose-framex > *:first-child { margin-top: 0 !important; }
+  /* Override the global `p { max-width: 65ch }` base reset so paragraphs
+     inside article prose fill the prose container instead of capping at 65ch */
+  .prose-framex p {
+    max-width: none;
+  }
   .prose-framex h2 {
     font-family: var(--font-display);
     @apply text-2xl font-bold mt-8 mb-3;
@@ -262,13 +270,14 @@ body {
   }
   .prose-framex p     { @apply mb-4; overflow-wrap: anywhere; }
   .prose-framex ul    { @apply list-disc pl-6 mb-4 space-y-1; }
+  .prose-framex ol    { @apply list-decimal pl-6 mb-4 space-y-1; }
   .prose-framex strong {
     font-weight: 700;
     color: var(--color-charcoal);
   }
   .prose-framex blockquote {
     border-left: 3px solid var(--color-orange);
-    @apply pl-6 italic my-8;
+    @apply pl-6 italic my-6;
     color: var(--color-concrete);
   }
   /* Rich-text images and tables must never exceed their container */
@@ -276,9 +285,9 @@ body {
     max-width: 100%;
     height: auto;
     display: block;
-    margin-top: 1.25rem;
-    margin-bottom: 1.25rem;
-    border-radius: 2px;
+    margin-top: 1.5rem;
+    margin-bottom: 1.5rem;
+    border-radius: 4px;
   }
   .prose-framex table {
     width: 100%;

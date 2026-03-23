@@ -95,7 +95,7 @@ export default async function BlogDetailPage({ params }: Props) {
     <>
       <JsonLd data={articleSchema} />
 
-      <nav className="pt-24 pb-4 bg-brand-white border-b border-brand-gray-100" aria-label="Breadcrumb">
+      <nav className="pt-24 pb-3 bg-brand-white border-b border-brand-gray-100" aria-label="Breadcrumb">
         <div className="container-base">
           {/* flex-wrap + overflow:hidden keeps breadcrumb from overflowing on mobile
               when the post title is very long */}
@@ -114,10 +114,12 @@ export default async function BlogDetailPage({ params }: Props) {
         </div>
       </nav>
 
-      <article className="bg-brand-white" style={{ paddingTop: '2.5rem', paddingBottom: '3rem' }}>
+      <article className="bg-brand-white" style={{ paddingTop: '1.75rem', paddingBottom: '3.5rem' }}>
         <div className="container-base max-w-3xl">
+
+          {/* ── Category label ───────────────────────────── */}
           {post.category && (
-            <p className="text-xs uppercase tracking-widest text-brand-gray-400 mb-3 font-medium">
+            <p className="text-xs uppercase tracking-widest text-brand-gray-400 mb-2 font-medium">
               {post.category === 'pain-based'  ? (locale === 'vi' ? 'Tình huống thực tế' : 'Pain-based')  :
                post.category === 'comparative' ? (locale === 'vi' ? 'So sánh'            : 'Comparative')  :
                post.category === 'case-based'  ? (locale === 'vi' ? 'Case study'         : 'Case study')   :
@@ -125,14 +127,19 @@ export default async function BlogDetailPage({ params }: Props) {
                post.category}
             </p>
           )}
-          <h1 className="text-display-md font-semibold text-brand-black mb-3" style={{ overflowWrap: 'break-word', wordBreak: 'break-word' }}>
+
+          {/* ── Title ─────────────────────────────────────── */}
+          <h1 className="text-display-md font-semibold text-brand-black mb-3 leading-tight" style={{ overflowWrap: 'break-word', wordBreak: 'break-word' }}>
             {tField(post as never, 'title', locale)}
           </h1>
-          <p className="text-lg text-brand-gray-500 mb-5" style={{ overflowWrap: 'break-word' }}>
+
+          {/* ── Excerpt ───────────────────────────────────── */}
+          <p className="text-lg text-brand-gray-500 mb-4 leading-relaxed" style={{ overflowWrap: 'break-word', maxWidth: 'none' }}>
             {tField(post as never, 'excerpt', locale)}
           </p>
 
-          <div className="flex gap-4 text-sm text-brand-gray-400 mb-6 pb-5 border-b border-brand-gray-100">
+          {/* ── Meta row (date + reading time) ────────────── */}
+          <div className="flex flex-wrap gap-4 text-sm text-brand-gray-400 mb-5 pb-4 border-b border-brand-gray-100">
             {post.published_at && (
               <time dateTime={post.published_at}>
                 {new Date(post.published_at).toLocaleDateString(
@@ -146,17 +153,21 @@ export default async function BlogDetailPage({ params }: Props) {
             )}
           </div>
 
+          {/* ── Cover image ───────────────────────────────── */}
           {post.cover_image && (
-            <img
-              src={post.cover_image}
-              alt={tField(post as never, 'title', locale)}
-              className="w-full rounded-sm mb-8"
-              style={{ display: 'block', maxHeight: '520px', objectFit: 'cover' }}
-              loading="eager"
-              decoding="async"
-            />
+            <div className="mb-8 rounded-sm overflow-hidden">
+              <img
+                src={post.cover_image}
+                alt={tField(post as never, 'title', locale)}
+                className="w-full"
+                style={{ display: 'block', maxHeight: '480px', objectFit: 'cover', width: '100%' }}
+                loading="eager"
+                decoding="async"
+              />
+            </div>
           )}
 
+          {/* ── Body content ─────────────────────────────── */}
           <div
             className="prose-framex"
             dangerouslySetInnerHTML={{
