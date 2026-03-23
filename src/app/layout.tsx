@@ -19,14 +19,8 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
   },
   icons: {
-    icon: [
-      { url: '/favicon.ico', sizes: 'any' },
-      { url: '/icon-192.png', type: 'image/png', sizes: '192x192' },
-      { url: '/icon-512.png', type: 'image/png', sizes: '512x512' },
-    ],
-    apple: [
-      { url: '/apple-touch-icon.png', sizes: '180x180', type: 'image/png' },
-    ],
+    // Only favicon.ico for now — brand PNG icons to be provided by designer
+    icon: '/favicon.ico',
     shortcut: '/favicon.ico',
   },
 };
