@@ -1,5 +1,5 @@
 'use client';
-import { useState } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import type { Project } from '@/types/content';
 import ImageUploader from './ImageUploader';
@@ -138,7 +138,7 @@ export default function ProjectForm({ mode, initialData, userId }: Props) {
       {tab === 'basic' && (
         <div className="admin-card">
           {/* Bilingual titles */}
-          <div className="bilingual-grid" style={{ marginBottom: 24 }}>
+          <div className="bilingual-grid" style={{ marginBottom: 20 }}>
             <div>
               <div className="bilingual-col-header vi">
                 <span className="lang-flag vi">VI</span> Tiếng Việt
@@ -192,7 +192,7 @@ export default function ProjectForm({ mode, initialData, userId }: Props) {
             </div>
           </div>
 
-          {/* Slug + Category — min-width:0 on each cell prevents overflow */}
+          {/* Slug + Category */}
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: 16, marginBottom: 16 }}>
             <div className="form-group" style={{ minWidth: 0 }}>
               <label className="form-label">Slug (URL) <span className="required">*</span></label>
@@ -212,7 +212,7 @@ export default function ProjectForm({ mode, initialData, userId }: Props) {
             </div>
           </div>
 
-          {/* Client / Location / Year — repeat(3,minmax(0,1fr)) prevents child overflow */}
+          {/* Client / Location / Year */}
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: 16, marginBottom: 16 }}>
             <div className="form-group" style={{ minWidth: 0 }}>
               <label className="form-label">Tên khách hàng</label>
@@ -321,7 +321,7 @@ export default function ProjectForm({ mode, initialData, userId }: Props) {
       {/* ── Tab: Media ───────────────────────────────────────────── */}
       {tab === 'media' && (
         <div className="admin-card">
-          <div className="form-group" style={{ marginBottom: 32 }}>
+          <div className="form-group" style={{ marginBottom: 28 }}>
             <ImageUploader
               label="Ảnh bìa (Cover image)"
               value={coverImage}
@@ -347,8 +347,8 @@ export default function ProjectForm({ mode, initialData, userId }: Props) {
         </div>
       )}
 
-      {/* ── Action bar ───────────────────────────────────────────── */}
-      <div className="admin-card" style={{ marginTop: 16, display: 'flex', gap: 12, justifyContent: 'space-between', alignItems: 'center' }}>
+      {/* ── Sticky action bar ────────────────────────────────────── */}
+      <div className="form-action-bar">
         <button
           type="button"
           className="btn btn-secondary"
@@ -356,7 +356,7 @@ export default function ProjectForm({ mode, initialData, userId }: Props) {
         >
           ← Quay lại
         </button>
-        <div style={{ display: 'flex', gap: 12 }}>
+        <div className="form-action-bar-right">
           <button
             type="submit"
             className="btn btn-secondary"
@@ -379,40 +379,112 @@ export default function ProjectForm({ mode, initialData, userId }: Props) {
   );
 }
 
-// ── Minimal rich text editor (no external deps) ─────────────────────────────
-function SimpleRichEditor({ value, onChange, placeholder }: {
+// ── SimpleRichEditor ─────────────────────────────────────────────────────────
+//
+// Identical fix strategy as PostForm's SimpleEditor:
+// 1. useRef to own innerHTML — no cursor-jump from React re-renders
+// 2. onMouseDown.preventDefault() on toolbar buttons — preserves selection
+// 3. .is-empty class for placeholder (handles <br> left by contentEditable)
+// 4. editor-wrap flex container for correct bilingual-grid sizing
+// ────────────────────────────────────────────────────────────────────────────
+
+const TOOLBAR_BUTTONS = [
+  { cmd: 'bold',                label: 'B',       style: { fontWeight: 700 },             title: 'Bold (Ctrl+B)',   group: 1 },
+  { cmd: 'italic',              label: 'I',       style: { fontStyle: 'italic' },         title: 'Italic (Ctrl+I)', group: 1 },
+  { cmd: 'underline',           label: 'U',       style: { textDecoration: 'underline' }, title: 'Underline (Ctrl+U)', group: 1 },
+  { cmd: 'insertUnorderedList', label: '• List',  style: {},                              title: 'Bullet list',     group: 2 },
+  { cmd: 'insertOrderedList',   label: '1. List', style: {},                              title: 'Numbered list',   group: 2 },
+  { cmd: 'h2',  label: 'H2', style: { fontWeight: 700 }, title: 'Heading 2', group: 3, isBlock: true },
+  { cmd: 'h3',  label: 'H3', style: { fontWeight: 600 }, title: 'Heading 3', group: 3, isBlock: true },
+  { cmd: 'p',   label: 'P',  style: {},                  title: 'Paragraph', group: 3, isBlock: true },
+];
+
+function SimpleRichEditor({
+  value,
+  onChange,
+  placeholder,
+}: {
   value: string;
   onChange: (v: string) => void;
   placeholder?: string;
 }) {
-  function exec(cmd: string, val?: string) {
-    document.execCommand(cmd, false, val);
+  const editorRef  = useRef<HTMLDivElement>(null);
+  const initialised = useRef(false);
+
+  useEffect(() => {
+    if (!initialised.current && editorRef.current) {
+      editorRef.current.innerHTML = value;
+      initialised.current = true;
+      updatePlaceholder();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    if (initialised.current && value === '' && editorRef.current) {
+      editorRef.current.innerHTML = '';
+      updatePlaceholder();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [value]);
+
+  function updatePlaceholder() {
+    if (!editorRef.current) return;
+    const html = editorRef.current.innerHTML;
+    const isEmpty = html === '' || html === '<br>';
+    editorRef.current.classList.toggle('is-empty', isEmpty);
   }
 
+  function handleInput() {
+    if (!editorRef.current) return;
+    onChange(editorRef.current.innerHTML);
+    updatePlaceholder();
+  }
+
+  const execCmd = useCallback((cmd: string, isBlock?: boolean) => {
+    if (isBlock) {
+      document.execCommand('formatBlock', false, cmd);
+    } else {
+      document.execCommand(cmd, false, undefined);
+    }
+    if (editorRef.current) {
+      onChange(editorRef.current.innerHTML);
+      updatePlaceholder();
+      editorRef.current.focus();
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [onChange]);
+
   return (
-    <div>
+    <div className="editor-wrap">
       <div className="editor-toolbar">
-        {[
-          { cmd: 'bold', label: 'B', style: { fontWeight: 700 } },
-          { cmd: 'italic', label: 'I', style: { fontStyle: 'italic' } },
-          { cmd: 'underline', label: 'U', style: { textDecoration: 'underline' } },
-        ].map(({ cmd, label, style }) => (
-          <button key={cmd} type="button" onClick={() => exec(cmd)} style={style}>{label}</button>
-        ))}
-        <button type="button" onClick={() => exec('insertUnorderedList')}>• List</button>
-        <button type="button" onClick={() => exec('insertOrderedList')}>1. List</button>
-        <button type="button" onClick={() => exec('formatBlock', 'h2')}>H2</button>
-        <button type="button" onClick={() => exec('formatBlock', 'h3')}>H3</button>
-        <button type="button" onClick={() => exec('formatBlock', 'p')}>P</button>
+        {TOOLBAR_BUTTONS.map((btn, idx) => {
+          const prevGroup = idx > 0 ? TOOLBAR_BUTTONS[idx - 1].group : btn.group;
+          const sep = btn.group !== prevGroup;
+          return (
+            <span key={btn.cmd} style={{ display: 'contents' }}>
+              {sep && <span className="editor-toolbar-sep" aria-hidden="true" />}
+              <button
+                type="button"
+                title={btn.title}
+                style={btn.style as React.CSSProperties}
+                onMouseDown={(e) => e.preventDefault()}
+                onClick={() => execCmd(btn.cmd, btn.isBlock)}
+              >
+                {btn.label}
+              </button>
+            </span>
+          );
+        })}
       </div>
       <div
+        ref={editorRef}
         className="rich-editor editor-has-toolbar"
         contentEditable
         suppressContentEditableWarning
-        dangerouslySetInnerHTML={{ __html: value }}
-        onInput={(e) => onChange((e.target as HTMLDivElement).innerHTML)}
+        onInput={handleInput}
         data-placeholder={placeholder}
-        style={{ minHeight: 320, maxWidth: '100%', boxSizing: 'border-box' }}
+        style={{ minHeight: 400, maxWidth: '100%', boxSizing: 'border-box' }}
       />
     </div>
   );

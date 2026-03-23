@@ -88,12 +88,14 @@
 .admin-topbar-actions { display: flex; align-items: center; gap: 12px; }
 
 .admin-content {
-  padding: 32px;
+  padding: 28px 32px;
   flex: 1;
   /* Prevent wide tables / editors from pushing content beyond the sidebar */
   overflow-x: hidden;
   /* Ensure the content area is a proper containing block for child widths */
   min-width: 0;
+  /* Allow the content area to scroll independently of the sidebar */
+  overflow-y: auto;
 }
 
 /* ── Cards / Stats ────────────────────────────────────── */
@@ -101,7 +103,10 @@
   background: #fff;
   border: 1px solid #e5e7eb;
   border-radius: 10px;
-  padding: 24px;
+  padding: 20px 24px;
+  /* Cards should not overflow their column */
+  min-width: 0;
+  overflow: hidden;
 }
 
 .admin-stat-grid {
@@ -173,33 +178,52 @@
 }
 .form-error { font-size: 12px; color: #dc2626; margin-top: 4px; }
 
-/* ── Bilingual editor grid ─────────────────────────────── */
+/* ── Bilingual editor grid ─────────────────────────────────────────────────
+ *
+ * Two-column layout for VI/EN parallel editing.
+ *
+ * Gap reduced from 24px → 20px to give each column slightly more room.
+ * align-items: start — columns don't stretch to equal height, each grows
+ * naturally with its content so one column can't compress the other.
+ * ─────────────────────────────────────────────────────────────────────── */
 .bilingual-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 24px;
+  gap: 20px;
+  align-items: start; /* columns grow independently, no forced equal height */
 }
-/* Collapse to single column below 1280px for better editor usability
-   — two 300px editors at 50% width become cramped on 1024-1279px screens */
-@media (max-width: 1279px) {
+/* Collapse to single column below 1200px so each editor gets full width.
+   Changed from 1279px to 1200px to match the .admin-content breakpoint. */
+@media (max-width: 1199px) {
   .bilingual-grid { grid-template-columns: 1fr; }
 }
-/* CRITICAL: grid children must have min-width:0 or they won't shrink below
-   their content width, causing overflow with long unbroken strings */
-.bilingual-grid > * { min-width: 0; }
+/* CRITICAL: grid children must have min-width:0 — without this a child
+   cannot shrink below its content width (grid spec default is min-width:auto)
+   which causes overflow when a long unbroken URL is typed in the editor. */
+.bilingual-grid > * { min-width: 0; overflow: hidden; }
 .bilingual-col-header {
-  display: flex; align-items: center; gap: 8px;
-  font-size: 12px; font-weight: 600; text-transform: uppercase;
-  letter-spacing: .06em; color: #6b7280;
-  margin-bottom: 12px; padding-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .07em;
+  color: #6b7280;
+  margin-bottom: 10px;
+  padding-bottom: 8px;
   border-bottom: 2px solid #e5e7eb;
 }
 .bilingual-col-header.vi { border-color: #ef4444; }
 .bilingual-col-header.en { border-color: #3b82f6; }
 .lang-flag {
-  width: 20px; height: 14px; border-radius: 2px;
-  display: inline-flex; align-items: center; justify-content: center;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px; height: 15px;
+  border-radius: 2px;
   font-size: 10px; font-weight: 700;
+  flex-shrink: 0;
 }
 .lang-flag.vi { background: #dc143c; color: #fff; }
 .lang-flag.en { background: #003080; color: #fff; }
@@ -244,38 +268,177 @@
 .badge-contacted { background: #f3e8ff; color: #7c3aed; }
 .badge-closed    { background: #f1f5f9; color: #64748b; }
 
-/* ── Rich text editor placeholder ─────────────────────── */
+/* ── Rich text editor ──────────────────────────────────────────────────────
+ *
+ * Layout fix summary:
+ * 1. editor-wrap       — new flex-column container that keeps toolbar +
+ *                        editor as a single visual unit with min-width:0
+ *                        (required inside bilingual-grid or any 1fr column).
+ * 2. editor-toolbar    — sticky top so it stays visible when scrolling long
+ *                        content; border-bottom now a hairline separator;
+ *                        gap increased for touch targets.
+ * 3. editor-toolbar button — explicit min-width/min-height for touch;
+ *                        font-size slightly larger; transitions added.
+ * 4. editor-toolbar button[data-active] — CSS active state driven by a
+ *                        data attribute (set by JS) rather than a class,
+ *                        so it works even when the element isn't focused.
+ * 5. rich-editor        — min-height raised to 400px so content is
+ *                        comfortable; no artificial max-height cap (content
+ *                        can grow freely); border-top removed (toolbar
+ *                        border-bottom covers the join).
+ * 6. Content typography — headings inside the editor styled to be visually
+ *                        distinct so the editor gives real WYSIWYG feedback.
+ * ─────────────────────────────────────────────────────────────────────── */
+
+/* Wrapper keeps toolbar + editor together and respects grid min-width */
+.editor-wrap {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  width: 100%;
+}
+
+.editor-toolbar {
+  display: flex;
+  gap: 3px;
+  flex-wrap: wrap;
+  padding: 6px 8px;
+  border: 1px solid #d1d5db;
+  border-radius: 7px 7px 0 0;
+  background: #f3f4f6;
+  border-bottom: 1px solid #e5e7eb;
+  /* Stick to top so toolbar stays visible when editor content is long */
+  position: sticky;
+  top: 0;
+  z-index: 2;
+}
+
+/* Toolbar separator between button groups */
+.editor-toolbar-sep {
+  width: 1px;
+  align-self: stretch;
+  background: #d1d5db;
+  margin: 2px 3px;
+  flex-shrink: 0;
+}
+
+.editor-toolbar button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 30px;
+  min-height: 28px;
+  padding: 3px 8px;
+  font-size: 13px;
+  font-family: inherit;
+  border: 1px solid transparent;
+  border-radius: 5px;
+  background: transparent;
+  cursor: pointer;
+  color: #374151;
+  transition: background .1s, border-color .1s, color .1s;
+  white-space: nowrap;
+  /* Prevent button from submitting the form if focus escapes */
+  user-select: none;
+}
+.editor-toolbar button:hover {
+  background: #e5e7eb;
+  border-color: #d1d5db;
+}
+/* Active state via data attribute — set by JS onmousedown */
+.editor-toolbar button[data-active="true"] {
+  background: #e0e7ff;
+  border-color: #a5b4fc;
+  color: #3730a3;
+  font-weight: 700;
+}
+/* Keyboard shortcut hint tooltip */
+.editor-toolbar button[title]:hover::after {
+  content: attr(title);
+  position: absolute;
+  bottom: calc(100% + 6px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: #1f2937;
+  color: #fff;
+  font-size: 11px;
+  padding: 3px 7px;
+  border-radius: 4px;
+  white-space: nowrap;
+  pointer-events: none;
+  z-index: 10;
+}
+.editor-toolbar button { position: relative; }
+
+/* Rich editor area */
 .rich-editor {
-  min-height: 320px;
-  max-height: 560px;
+  flex: 1 1 auto;
+  min-height: 400px;
+  /* no max-height cap — content grows freely, outer card scrolls */
   overflow-y: auto;
-  border: 1px solid #d1d5db; border-radius: 7px;
-  padding: 14px 12px; font-size: 14px; line-height: 1.65;
-  background: #fff; outline: none;
-  /* prevent long URLs / unbroken strings from overflowing the editor */
+  border: 1px solid #d1d5db;
+  border-top: none; /* toolbar bottom border covers the join */
+  border-radius: 0 0 7px 7px;
+  padding: 14px 14px 20px;
+  font-size: 14px;
+  line-height: 1.7;
+  background: #fff;
+  outline: none;
+  color: #111827;
+  /* overflow protection */
   overflow-wrap: anywhere;
   word-break: break-word;
   overflow-x: hidden;
   max-width: 100%;
+  box-sizing: border-box;
+  /* smooth cursor rendering */
+  caret-color: #3b82f6;
 }
+/* Placeholder via ::before on the editor root */
+.rich-editor.is-empty:before {
+  content: attr(data-placeholder);
+  color: #9ca3af;
+  pointer-events: none;
+  display: block;
+  font-style: italic;
+}
+/* Legacy empty selector kept for browsers that set :empty correctly */
 .rich-editor:empty:before {
   content: attr(data-placeholder);
   color: #9ca3af;
   pointer-events: none;
   display: block;
 }
-.rich-editor:focus { border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59,130,246,.15); }
-.editor-toolbar {
-  display: flex; gap: 4px; flex-wrap: wrap;
-  padding: 8px; border: 1px solid #d1d5db; border-radius: 7px 7px 0 0;
-  background: #f9fafb; border-bottom: none;
+.rich-editor:focus {
+  border-color: #3b82f6;
+  /* only bottom + sides — top is covered by toolbar */
+  box-shadow: 0 0 0 3px rgba(59,130,246,.12), inset 0 1px 0 rgba(59,130,246,.08);
 }
-.editor-toolbar button {
-  padding: 5px 9px; font-size: 13px; border: 1px solid transparent;
-  border-radius: 5px; background: transparent; cursor: pointer; color: #374151;
+/* Focus also highlights the toolbar border */
+.editor-wrap:focus-within .editor-toolbar {
+  border-color: #3b82f6;
+  border-bottom-color: #e5e7eb; /* keep separator subtle */
 }
-.editor-toolbar button:hover { background: #e5e7eb; }
-.editor-toolbar button.active { background: #e5e7eb; font-weight: 700; }
+
+/* WYSIWYG typography inside the editor */
+.rich-editor h2 {
+  font-size: 1.2em; font-weight: 700; margin: 1em 0 .4em;
+  line-height: 1.3; color: #111827;
+}
+.rich-editor h3 {
+  font-size: 1.05em; font-weight: 600; margin: .9em 0 .35em;
+  line-height: 1.3; color: #1f2937;
+}
+.rich-editor p { margin: 0 0 .65em; }
+.rich-editor ul, .rich-editor ol {
+  padding-left: 1.5em; margin: .4em 0 .65em;
+}
+.rich-editor li { margin-bottom: .25em; }
+.rich-editor strong { font-weight: 700; }
+.rich-editor em { font-style: italic; }
+.rich-editor u { text-decoration: underline; }
+
+/* Legacy class kept — now handled by editor-wrap + rich-editor structure */
 .editor-has-toolbar { border-radius: 0 0 7px 7px; }
 
 /* ── Login page ────────────────────────────────────────── */
@@ -384,7 +547,46 @@
   align-items: center; justify-content: center; line-height: 1;
 }
 
+/* ── Action bar (save/publish buttons row) ────────────────────────────────
+ * Prevent the button row from overflowing on narrow screens.
+ * justify-content:space-between + flex-wrap ensures Back + Save/Publish
+ * stack gracefully rather than clipping off-screen.
+ * ─────────────────────────────────────────────────────────────────────── */
+.form-action-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 16px;
+  padding: 14px 20px;
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  /* Sticky at the bottom of the viewport so buttons are always reachable
+     when the form is very long (many editor lines). */
+  position: sticky;
+  bottom: 0;
+  z-index: 10;
+  /* Subtle top shadow to separate it from scrolled content */
+  box-shadow: 0 -2px 8px rgba(0,0,0,.06);
+}
+.form-action-bar-right {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+}
+
 /* ── Responsive ─────────────────────────────────────────── */
+
+/* Tablet: sidebar stays open but content gets less padding */
+@media (max-width: 1024px) {
+  .admin-content { padding: 20px 24px; }
+  /* 3-col meta grids become 2-col on tablet */
+  .admin-meta-grid-3 { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
+}
+
 @media (max-width: 768px) {
   .admin-sidebar { transform: translateX(-100%); transition: transform .3s; }
   .admin-sidebar.open { transform: translateX(0); }
@@ -393,6 +595,14 @@
   .admin-stat-grid { grid-template-columns: 1fr 1fr; }
   /* on mobile the admin table title column must clamp to avoid pushing actions off-screen */
   .admin-table td { max-width: 180px; }
-  .admin-content { padding: 16px; overflow-x: hidden; }
+  .admin-content { padding: 14px 16px; overflow-x: hidden; }
   .tab-btn { padding: 8px 12px; font-size: 13px; }
+  /* All multi-col grids collapse to 1 col on mobile */
+  .admin-meta-grid-3 { grid-template-columns: 1fr !important; }
+  /* Action bar stacks on mobile */
+  .form-action-bar { flex-direction: column; align-items: stretch; }
+  .form-action-bar-right { justify-content: stretch; }
+  .form-action-bar-right .btn { flex: 1; justify-content: center; }
+  /* Rich editor shorter on mobile to avoid taking up whole screen */
+  .rich-editor { min-height: 280px; }
 }

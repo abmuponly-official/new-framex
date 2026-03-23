@@ -1,5 +1,5 @@
 'use client';
-import { useState } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import type { Post } from '@/types/content';
 import ImageUploader from './ImageUploader';
@@ -91,7 +91,7 @@ export default function PostForm({ mode, initialData, userId }: Props) {
 
       {tab === 'basic' && (
         <div className="admin-card">
-          <div className="bilingual-grid" style={{ marginBottom: 24 }}>
+          <div className="bilingual-grid" style={{ marginBottom: 20 }}>
             <div>
               <div className="bilingual-col-header vi"><span className="lang-flag vi">VI</span> Tiếng Việt</div>
               <div className="form-group">
@@ -116,13 +116,11 @@ export default function PostForm({ mode, initialData, userId }: Props) {
             </div>
           </div>
 
-          {/* 3-col meta row — min-width:0 on each cell prevents content from overflowing
-              on narrow admin panels; collapses to 1-col below 640px via flex-wrap */}
+          {/* 3-col meta row */}
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: 16, marginBottom: 16 }}>
             <div className="form-group" style={{ minWidth: 0 }}>
               <label className="form-label">Slug <span className="required">*</span></label>
               <input className="form-input" value={slug} onChange={e => setSlug(e.target.value)} placeholder="bai-viet-slug" />
-              {/* title attribute shows the full path on hover; CSS truncates long slugs */}
               <p className="form-hint" title={`/vi/tin-tuc/${slug || '…'}`}>/vi/tin-tuc/{slug || '…'}</p>
             </div>
             <div className="form-group" style={{ minWidth: 0 }}>
@@ -151,11 +149,7 @@ export default function PostForm({ mode, initialData, userId }: Props) {
               hint="Tỷ lệ khuyến nghị 16:9 hoặc 2:1, WebP, tối đa 5MB."
             />
             {coverImage && (
-              <img
-                src={coverImage}
-                alt="Cover preview"
-                className="cover-preview"
-              />
+              <img src={coverImage} alt="Cover preview" className="cover-preview" />
             )}
           </div>
 
@@ -218,9 +212,12 @@ export default function PostForm({ mode, initialData, userId }: Props) {
         </div>
       )}
 
-      <div className="admin-card" style={{ marginTop: 16, display: 'flex', gap: 12, justifyContent: 'space-between', alignItems: 'center' }}>
-        <button type="button" className="btn btn-secondary" onClick={() => router.push('/admin/posts')}>← Quay lại</button>
-        <div style={{ display: 'flex', gap: 12 }}>
+      {/* ── Sticky action bar ─────────────────────────────────────────────── */}
+      <div className="form-action-bar">
+        <button type="button" className="btn btn-secondary" onClick={() => router.push('/admin/posts')}>
+          ← Quay lại
+        </button>
+        <div className="form-action-bar-right">
           <button type="submit" className="btn btn-secondary" disabled={saving} onClick={(e) => handleSubmit(e)}>
             {saving ? 'Đang lưu…' : '💾 Lưu nháp'}
           </button>
@@ -233,27 +230,143 @@ export default function PostForm({ mode, initialData, userId }: Props) {
   );
 }
 
-function SimpleEditor({ value, onChange, placeholder }: { value: string; onChange: (v: string) => void; placeholder?: string }) {
+// ── SimpleEditor ─────────────────────────────────────────────────────────────
+//
+// Key fixes vs the old implementation:
+//
+// 1. useRef instead of dangerouslySetInnerHTML
+//    The old editor used dangerouslySetInnerHTML={{ __html: value }} on every
+//    render. Because value comes from React state (updated on every keystroke),
+//    React kept replacing the editor's innerHTML — destroying the browser's
+//    cursor/selection position on every keypress. Fix: mount the initial HTML
+//    once via useEffect on the ref, then NEVER write innerHTML again from React;
+//    let the browser own the DOM and only read from it via onInput.
+//
+// 2. mousedown.preventDefault() on toolbar buttons
+//    Without this, clicking a toolbar button causes the editor to lose focus
+//    first (blur event fires), then execCommand runs on no selection. Fix:
+//    preventDefault() on mousedown stops the blur from happening, so the editor
+//    selection is preserved when execCommand fires on the click event.
+//
+// 3. Placeholder via CSS class (is-empty)
+//    contentEditable with :empty:before works only when the element is truly
+//    empty in the DOM. After the user types then deletes everything, the div
+//    contains a <br> (inserted by contentEditable) so :empty never matches.
+//    Fix: toggle the .is-empty class based on whether innerHTML is ''/'<br>'.
+//
+// 4. editor-wrap container
+//    Wraps toolbar + editor in a flex-column so they form one visual unit and
+//    correctly obey min-width:0 inside the bilingual-grid.
+//
+// ────────────────────────────────────────────────────────────────────────────
+
+const TOOLBAR_BUTTONS = [
+  { cmd: 'bold',               label: 'B',      style: { fontWeight: 700 },       title: 'Bold (Ctrl+B)',          group: 1 },
+  { cmd: 'italic',             label: 'I',      style: { fontStyle: 'italic' },   title: 'Italic (Ctrl+I)',        group: 1 },
+  { cmd: 'underline',          label: 'U',      style: { textDecoration: 'underline' }, title: 'Underline (Ctrl+U)', group: 1 },
+  { cmd: 'insertUnorderedList',label: '• List', style: {},                        title: 'Bullet list',            group: 2 },
+  { cmd: 'insertOrderedList',  label: '1. List',style: {},                        title: 'Numbered list',          group: 2 },
+  { cmd: 'h2',                 label: 'H2',     style: { fontWeight: 700 },       title: 'Heading 2',              group: 3, isBlock: true },
+  { cmd: 'h3',                 label: 'H3',     style: { fontWeight: 600 },       title: 'Heading 3',              group: 3, isBlock: true },
+  { cmd: 'p',                  label: 'P',      style: {},                        title: 'Paragraph',              group: 3, isBlock: true },
+];
+
+function SimpleEditor({
+  value,
+  onChange,
+  placeholder,
+}: {
+  value: string;
+  onChange: (v: string) => void;
+  placeholder?: string;
+}) {
+  const editorRef = useRef<HTMLDivElement>(null);
+  // Track whether we are initialised to avoid writing innerHTML after mount
+  const initialised = useRef(false);
+
+  // Mount: write initial HTML once
+  useEffect(() => {
+    if (!initialised.current && editorRef.current) {
+      editorRef.current.innerHTML = value;
+      initialised.current = true;
+      updatePlaceholder();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // If the parent resets value to '' (e.g. after form submit), clear the editor
+  useEffect(() => {
+    if (initialised.current && value === '' && editorRef.current) {
+      editorRef.current.innerHTML = '';
+      updatePlaceholder();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [value]);
+
+  function updatePlaceholder() {
+    if (!editorRef.current) return;
+    const html = editorRef.current.innerHTML;
+    const isEmpty = html === '' || html === '<br>';
+    editorRef.current.classList.toggle('is-empty', isEmpty);
+  }
+
+  function handleInput() {
+    if (!editorRef.current) return;
+    onChange(editorRef.current.innerHTML);
+    updatePlaceholder();
+  }
+
+  // Execute a formatting command without losing editor focus.
+  // mouseDown.preventDefault() must be called on the button to stop blur,
+  // but we still need to call exec AFTER the event bubbles — that happens
+  // naturally because click fires after mousedown + mouseup.
+  const execCmd = useCallback((cmd: string, isBlock?: boolean) => {
+    if (isBlock) {
+      document.execCommand('formatBlock', false, cmd);
+    } else {
+      document.execCommand(cmd, false, undefined);
+    }
+    // Re-read content after command
+    if (editorRef.current) {
+      onChange(editorRef.current.innerHTML);
+      updatePlaceholder();
+      editorRef.current.focus();
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [onChange]);
+
   return (
-    <div>
+    <div className="editor-wrap">
       <div className="editor-toolbar">
-        {[['bold','B',{fontWeight:700}],['italic','I',{fontStyle:'italic'}],['underline','U',{textDecoration:'underline'}]].map(([cmd, label, style]) => (
-          <button key={cmd as string} type="button" onClick={() => document.execCommand(cmd as string, false)} style={style as React.CSSProperties}>{label as string}</button>
-        ))}
-        <button type="button" onClick={() => document.execCommand('insertUnorderedList', false)}>• List</button>
-        <button type="button" onClick={() => document.execCommand('insertOrderedList', false)}>1. List</button>
-        <button type="button" onClick={() => document.execCommand('formatBlock', false, 'h2')}>H2</button>
-        <button type="button" onClick={() => document.execCommand('formatBlock', false, 'h3')}>H3</button>
-        <button type="button" onClick={() => document.execCommand('formatBlock', false, 'p')}>P</button>
+        {TOOLBAR_BUTTONS.map((btn, idx) => {
+          // Insert a visual separator when group changes
+          const prevGroup = idx > 0 ? TOOLBAR_BUTTONS[idx - 1].group : btn.group;
+          const sep = btn.group !== prevGroup;
+          return (
+            <span key={btn.cmd} style={{ display: 'contents' }}>
+              {sep && <span className="editor-toolbar-sep" aria-hidden="true" />}
+              <button
+                type="button"
+                title={btn.title}
+                style={btn.style as React.CSSProperties}
+                // CRITICAL: preventDefault stops the editor from losing focus
+                onMouseDown={(e) => e.preventDefault()}
+                onClick={() => execCmd(btn.cmd, btn.isBlock)}
+              >
+                {btn.label}
+              </button>
+            </span>
+          );
+        })}
       </div>
       <div
+        ref={editorRef}
         className="rich-editor editor-has-toolbar"
         contentEditable
         suppressContentEditableWarning
-        dangerouslySetInnerHTML={{ __html: value }}
-        onInput={(e) => onChange((e.target as HTMLDivElement).innerHTML)}
+        onInput={handleInput}
         data-placeholder={placeholder}
-        style={{ minHeight: 320, maxWidth: '100%', boxSizing: 'border-box' }}
+        style={{ minHeight: 400, maxWidth: '100%', boxSizing: 'border-box' }}
       />
     </div>
   );
