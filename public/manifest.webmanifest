@@ -1,0 +1,13 @@
+{
+  "name": "FrameX",
+  "short_name": "FrameX",
+  "description": "Giải pháp 3-trong-1 cho phần khung và vỏ công trình",
+  "start_url": "/vi",
+  "display": "browser",
+  "background_color": "#111111",
+  "theme_color": "#111111",
+  "icons": [
+    { "src": "/apple-touch-icon.png", "sizes": "180x180", "type": "image/png" },
+    { "src": "/favicon.svg", "sizes": "any", "type": "image/svg+xml" }
+  ]
+}

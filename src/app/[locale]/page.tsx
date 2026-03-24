@@ -2,6 +2,7 @@ import { getTranslations, setRequestLocale } from 'next-intl/server';
 import type { Metadata } from 'next';
 import type { Locale } from '@/lib/i18n/request';
 import JsonLd from '@/components/seo/JsonLd';
+import { getSiteSettings, getSetting } from '@/lib/supabase/settings';
 import HeroSection from '@/components/sections/HeroSection';
 import GuidedQuestion from '@/components/sections/GuidedQuestion';
 import BridgeSection from '@/components/sections/BridgeSection';
@@ -19,9 +20,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   setRequestLocale(locale);
   const isVI = locale === 'vi';
   return {
-    title: isVI
-      ? 'FrameX — Giải pháp 3-trong-1 cho phần khung và vỏ công trình'
-      : 'FrameX — 3-in-1 Solution for Building Frame & Envelope',
+    title: {
+      absolute: isVI
+        ? 'FrameX — Giải pháp 3-trong-1 cho phần khung và vỏ công trình'
+        : 'FrameX — 3-in-1 Solution for Building Frame & Envelope',
+    },
     description: isVI
       ? 'FrameX tích hợp kết cấu thép tiền chế, cách nhiệt hiệu suất cao và chống thấm toàn diện. 1 đầu mối, 1 tiến độ, 1 bộ bản vẽ đồng bộ.'
       : 'FrameX integrates pre-engineered steel, high-performance insulation and comprehensive waterproofing. 1 contact, 1 schedule, 1 synchronized drawing set.',
@@ -46,14 +49,25 @@ export default async function HomePage({ params }: Props) {
   const locale = params.locale as Locale;
   setRequestLocale(locale);
 
-  const localBusinessSchema = {
+  // Pull real contact data from CMS for structured data
+  const settings  = await getSiteSettings();
+  const cmsEmail  = getSetting(settings, 'contact_email', locale);
+  const cmsPhone  = getSetting(settings, 'contact_phone', locale);
+  const cmsAddr   = getSetting(settings, 'address', locale);
+
+  const localBusinessSchema: Record<string, unknown> = {
     '@context': 'https://schema.org',
     '@type': 'LocalBusiness',
     name: 'FrameX',
     description:
-      'Giải pháp 3-trong-1 cho phần khung và vỏ công trình: kết cấu thép tiền chế, cách nhiệt hiệu suất cao và chống thấm toàn diện.',
+      locale === 'vi'
+        ? 'Giải pháp 3-trong-1 cho phần khung và vỏ công trình: kết cấu thép tiền chế, cách nhiệt hiệu suất cao và chống thấm toàn diện.'
+        : '3-in-1 solution for building frame and envelope: pre-engineered steel, high-performance insulation, comprehensive waterproofing.',
     url: 'https://framex.vn',
     logo: 'https://framex.vn/images/logo.png',
+    ...(cmsEmail ? { email: cmsEmail } : {}),
+    ...(cmsPhone ? { telephone: cmsPhone } : {}),
+    ...(cmsAddr  ? { address: { '@type': 'PostalAddress', streetAddress: cmsAddr, addressCountry: 'VN' } } : {}),
     serviceArea: { '@type': 'Country', name: 'Vietnam' },
     hasOfferCatalog: {
       '@type': 'OfferCatalog',
