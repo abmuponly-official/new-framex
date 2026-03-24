@@ -98,12 +98,17 @@ export default function BridgeParallax() {
         aria-hidden="true"
         style={{
           /*
-           * inset: -24px gives 24px bleed on all sides.
-           * MAX_TRAVEL (14px) + safety buffer (10px) = 24px → no edge exposure.
+           * Self-hosted: eliminates Pexels CDN DNS + TCP handshake (~100-300 ms).
+           * image-set(): serves WebP to modern browsers (saves ~18%), JPEG fallback.
+           * 30-day cache via next.config.js /images/* header rule.
+           * inset: -24px gives 24px bleed; MAX_TRAVEL (14px) + 10px buffer = safe.
            */
           inset: '-24px',
-          backgroundImage:
-            'url(https://images.pexels.com/photos/4067521/pexels-photo-4067521.jpeg?auto=compress&cs=tinysrgb&w=1600)',
+          backgroundImage: [
+            'image-set(url("/images/bridge-bg.webp") type("image/webp"), url("/images/bridge-bg.jpg") type("image/jpeg"))',
+            /* Legacy fallback for browsers without image-set() */
+            'url("/images/bridge-bg.jpg")',
+          ].join(', '),
           backgroundSize: 'cover',
           backgroundPosition: 'center 40%',
           backgroundRepeat: 'no-repeat',

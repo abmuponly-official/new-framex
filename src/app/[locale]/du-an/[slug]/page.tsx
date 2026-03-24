@@ -2,6 +2,7 @@ import { getTranslations, setRequestLocale } from 'next-intl/server';
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
+import Image from 'next/image';
 import type { Locale } from '@/lib/i18n/request';
 import { createClient } from '@/lib/supabase/server';
 import { t as tField } from '@/types/content';
@@ -176,14 +177,17 @@ export default async function ProjectDetailPage({ params }: Props) {
       {project.cover_image && (
         <div className="bg-brand-gray-50">
           <div className="container-base max-w-4xl" style={{ paddingTop: '1.25rem', paddingBottom: '1.25rem' }}>
-            <img
-              src={project.cover_image}
-              alt={tField(project as never, 'title', locale)}
-              className="w-full rounded-sm"
-              style={{ display: 'block', maxHeight: '480px', objectFit: 'cover' }}
-              loading="eager"
-              decoding="async"
-            />
+            {/* next/image: priority LCP preload + AVIF/WebP via Vercel CDN */}
+            <div className="relative rounded-sm overflow-hidden" style={{ maxHeight: '480px', aspectRatio: '16/9' }}>
+              <Image
+                src={project.cover_image}
+                alt={tField(project as never, 'title', locale)}
+                fill
+                sizes="(max-width: 768px) 100vw, 896px"
+                className="object-cover"
+                priority
+              />
+            </div>
           </div>
         </div>
       )}
@@ -210,12 +214,17 @@ export default async function ProjectDetailPage({ params }: Props) {
             <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
               {project.gallery.map((item, i) => (
                 <figure key={i}>
-                  <img
-                    src={item.url}
-                    alt={locale === 'vi' ? item.caption_vi : item.caption_en}
-                    className="w-full aspect-[4/3] object-cover rounded-sm"
-                    loading="lazy"
-                  />
+                  {/* next/image: lazy + AVIF/WebP for gallery (below-fold) */}
+                  <div className="relative aspect-[4/3] rounded-sm overflow-hidden">
+                    <Image
+                      src={item.url}
+                      alt={locale === 'vi' ? item.caption_vi : item.caption_en}
+                      fill
+                      sizes="(max-width: 768px) 50vw, 33vw"
+                      className="object-cover"
+                      loading="lazy"
+                    />
+                  </div>
                   {(item.caption_vi || item.caption_en) && (
                     <figcaption className="text-xs text-brand-gray-400 mt-1.5 leading-snug">
                       {locale === 'vi' ? item.caption_vi : item.caption_en}

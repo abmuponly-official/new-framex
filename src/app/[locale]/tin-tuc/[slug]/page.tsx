@@ -2,6 +2,7 @@ import { getTranslations, setRequestLocale } from 'next-intl/server';
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
+import Image from 'next/image';
 import type { Locale } from '@/lib/i18n/request';
 import { createClient } from '@/lib/supabase/server';
 import { t as tField } from '@/types/content';
@@ -171,14 +172,15 @@ export default async function BlogDetailPage({ params }: Props) {
 
           {/* ── Cover image ───────────────────────────────── */}
           {post.cover_image && (
-            <div className="mb-8 rounded-sm overflow-hidden">
-              <img
+            /* next/image LCP element: priority preload + AVIF/WebP + no CLS */
+            <div className="relative mb-8 rounded-sm overflow-hidden" style={{ maxHeight: '480px', aspectRatio: '16/9' }}>
+              <Image
                 src={post.cover_image}
                 alt={tField(post as never, 'title', locale)}
-                className="w-full"
-                style={{ display: 'block', maxHeight: '480px', objectFit: 'cover', width: '100%' }}
-                loading="eager"
-                decoding="async"
+                fill
+                sizes="(max-width: 768px) 100vw, 768px"
+                className="object-cover"
+                priority
               />
             </div>
           )}

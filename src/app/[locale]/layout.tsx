@@ -1,4 +1,5 @@
 import { NextIntlClientProvider } from 'next-intl';
+import type { AbstractIntlMessages } from 'next-intl';
 import { getMessages, getTranslations, setRequestLocale } from 'next-intl/server';
 import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
@@ -72,6 +73,20 @@ export default async function LocaleLayout({ children, params }: Props) {
 
   const messages = await getMessages();
 
+  // Only send the namespaces used by CLIENT components to the browser.
+  // Currently only Header uses useTranslations('nav'); all others are server-side.
+  // This reduces the JS bundle by ~25 KB (full messages → only 'nav' namespace).
+  // Safe: server components call getTranslations() directly and do not need this provider.
+  // Namespaces used by client components:
+  //   'nav'     → Header (useTranslations)
+  //   'contact' → ContactForm (useTranslations)
+  // All other namespaces (home, projects, blog, footer, solution…) are server-side only.
+  const m = messages as Record<string, AbstractIntlMessages>;
+  const clientMessages: AbstractIntlMessages = {
+    nav:     m.nav     ?? {},
+    contact: m.contact ?? {},
+  };
+
   return (
     <html lang={locale} suppressHydrationWarning>
       <head>
@@ -102,7 +117,7 @@ export default async function LocaleLayout({ children, params }: Props) {
         <link rel="manifest" href="/manifest.webmanifest" />
       </head>
       <body className="bg-brand-white text-brand-black font-sans antialiased" style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>
-        <NextIntlClientProvider messages={messages}>
+        <NextIntlClientProvider messages={clientMessages}>
           {/* Skip-to-content for keyboard / AT users */}
           <a href="#main-content" className="skip-to-content">
             {locale === 'vi' ? 'Bỏ qua đến nội dung chính' : 'Skip to main content'}

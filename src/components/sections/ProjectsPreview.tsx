@@ -1,5 +1,6 @@
 import { getTranslations } from 'next-intl/server';
 import Link from 'next/link';
+import Image from 'next/image';
 import type { Locale } from '@/lib/i18n/request';
 import { createClient } from '@/lib/supabase/server';
 import { t as tField } from '@/types/content';
@@ -62,12 +63,15 @@ export default async function ProjectsPreview({ locale }: Props) {
                 className="group block"
               >
                 {/* Image */}
-                <div className="aspect-[4/3] bg-brand-gray-100 mb-4 overflow-hidden rounded-sm">
+                <div className="relative aspect-[4/3] bg-brand-gray-100 mb-4 overflow-hidden rounded-sm">
                   {project.cover_image ? (
-                    <img
+                    /* next/image: auto AVIF/WebP, Vercel CDN, no layout shift */
+                    <Image
                       src={project.cover_image}
                       alt={tField(project as never, 'title', locale)}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                      fill
+                      sizes="(max-width: 768px) 100vw, 33vw"
+                      className="object-cover group-hover:scale-105 transition-transform duration-500"
                       loading="lazy"
                     />
                   ) : (

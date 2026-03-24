@@ -4,8 +4,16 @@ const createNextIntlPlugin = require('next-intl/plugin');
 const withNextIntl = createNextIntlPlugin('./src/lib/i18n/request.ts');
 
 const nextConfig = {
+  // Remove X-Powered-By header (saves ~30 bytes per response, minor security)
+  poweredByHeader: false,
+
   // Compress responses
   compress: true,
+
+  // Tree-shake lucide-react and other heavy icon/component libs at build time
+  experimental: {
+    optimizePackageImports: ['lucide-react'],
+  },
 
   // Power Up Image Optimisation
   images: {

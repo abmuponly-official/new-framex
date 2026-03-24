@@ -13,6 +13,10 @@ import ProjectsPreview from '@/components/sections/ProjectsPreview';
 import TrustSection from '@/components/sections/TrustSection';
 import FinalCTA from '@/components/sections/FinalCTA';
 
+// ISR: revalidate every 60 s — matches CMS settings cache TTL.
+// Vercel serves cached HTML from edge on subsequent requests → faster TTFB/LCP.
+export const revalidate = 60;
+
 type Props = { params: { locale: string } };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {

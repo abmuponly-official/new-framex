@@ -9,6 +9,9 @@ import type { Project, ProjectCategory } from '@/types/content';
 import FilterBar from '@/components/ui/FilterBar';
 import Pagination from '@/components/ui/Pagination';
 
+// ISR: revalidate every 60 s on Vercel (same TTL as project detail pages)
+export const revalidate = 60;
+
 const PAGE_SIZE = 6;
 
 type Props = {
