@@ -22,7 +22,7 @@ export async function GET(request: NextRequest) {
 
     if (status && status !== 'all') query = query.eq('status', status);
     if (role   && role   !== 'all') query = query.eq('role', role);
-    if (q) query = query.or(`name.ilike.%${q}%,email.ilike.%${q}%,phone.ilike.%${q}%`);
+    if (q) query = query.or(`name.ilike.%${q}%,email.ilike.%${q}%`);
 
     query = query.order('created_at', { ascending: false }).range(from, from + perPage - 1);
 

@@ -35,7 +35,7 @@ export default async function AdminLeadsPage({
     let query = admin.from('leads').select('*', { count: 'exact' });
     if (status && status !== 'all') query = query.eq('status', status);
     if (role && role !== 'all')     query = query.eq('role', role);
-    if (q) query = query.or(`name.ilike.%${q}%,email.ilike.%${q}%,phone.ilike.%${q}%`);
+    if (q) query = query.or(`name.ilike.%${q}%,email.ilike.%${q}%`);
     query = query.order('created_at', { ascending: false }).range(from, from + perPage - 1);
 
     const { data, count: cnt, error } = await query;
@@ -101,7 +101,7 @@ export default async function AdminLeadsPage({
               defaultValue={q}
               className="form-input"
               style={{ width: 220 }}
-              placeholder="Tên, email, SĐT…"
+              placeholder="Tên, email…"
             />
           </div>
           <div>
