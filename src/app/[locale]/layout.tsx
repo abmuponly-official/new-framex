@@ -2,11 +2,14 @@ import { NextIntlClientProvider } from 'next-intl';
 import { getMessages, getTranslations, setRequestLocale } from 'next-intl/server';
 import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
+import Script from 'next/script';
 import { locales, type Locale } from '@/lib/i18n/request';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import ScrollReveal from '@/components/ui/ScrollReveal';
 import RouteChangeHandler from '@/components/ui/RouteChangeHandler';
+
+const GA_ID = 'G-YZ0KYCK6BZ';
 
 type Props = {
   children: React.ReactNode;
@@ -110,6 +113,28 @@ export default async function LocaleLayout({ children, params }: Props) {
           <ScrollReveal />
           <RouteChangeHandler />
         </NextIntlClientProvider>
+
+        {/* ── Google Analytics 4 ──────────────────────────────────────────
+            strategy="afterInteractive" — loads after hydration, does NOT
+            block LCP or FID. gtag config fires on every hard navigation;
+            soft (SPA) navigations are tracked automatically by GA4's
+            enhanced measurement (page_view on history change).
+        ──────────────────────────────────────────────────────────────── */}
+        <Script
+          src={`https://www.googletagmanager.com/gtag/js?id=${GA_ID}`}
+          strategy="afterInteractive"
+        />
+        <Script id="ga4-init" strategy="afterInteractive">
+          {`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', '${GA_ID}', {
+              page_path: window.location.pathname,
+              send_page_view: true
+            });
+          `}
+        </Script>
       </body>
     </html>
   );
