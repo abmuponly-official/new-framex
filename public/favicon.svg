@@ -1,9 +1,10 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="none">
-  <!-- FrameX orange X favicon -->
-  <rect width="100" height="100" rx="18" fill="#F26430"/>
-  <!-- Left chevron arm (bold arrow) -->
-  <polygon points="10,15 38,50 10,85 28,85 56,50 28,15" fill="white"/>
-  <!-- Right X arm -->
-  <polygon points="44,15 62,15 90,85 72,85" fill="white"/>
-  <polygon points="44,85 62,85 90,15 72,15" fill="white"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <!-- FrameX favicon: orange background + white X logo -->
+  <rect width="100" height="100" rx="18" ry="18" fill="#F26430"/>
+  <!-- Left chevron arm (bold arrow pointing right) -->
+  <polygon points="10,15 38,50 10,85 28,85 56,50 28,15" fill="#ffffff"/>
+  <!-- Right X: top-left to bottom-right diagonal -->
+  <polygon points="44,15 62,15 90,85 72,85" fill="#ffffff"/>
+  <!-- Right X: bottom-left to top-right diagonal -->
+  <polygon points="44,85 62,85 90,15 72,15" fill="#ffffff"/>
 </svg>
