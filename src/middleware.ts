@@ -83,6 +83,18 @@ export async function middleware(request: NextRequest) {
     return response;
   }
 
+  // ── Unknown bare paths: /xyz, /abc-test → real 404, no redirect ─────────────
+  // next-intl (localePrefix:'always') normally redirects un-prefixed paths to
+  // /defaultLocale/path (307). For paths whose FIRST segment is not a known locale
+  // we let Next.js handle them directly so it returns a genuine 404 (HTTP 404,
+  // robots:noindex) instead of creating a pointless 307 → 404 redirect chain.
+  // Valid locale-prefixed paths (/vi/..., /en/...) are still forwarded to next-intl.
+  const firstSegment = pathname.split('/')[1]; // '' for '/', 'vi' for '/vi/...', 'xyz' for '/xyz'
+  if (!locales.includes(firstSegment as (typeof locales)[number])) {
+    // Not a locale prefix and not already caught above → let Next.js 404 it directly
+    return NextResponse.next();
+  }
+
   // ── next-intl handles all other locale routing ───────────────────────────────
   return intlMiddleware(request);
 }

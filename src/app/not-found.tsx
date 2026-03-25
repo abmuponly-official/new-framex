@@ -2,7 +2,9 @@ import Link from 'next/link';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: '404 — Page not found | FrameX',
+  // Use `absolute` so the root layout title template ('%s | FrameX') is NOT applied,
+  // preventing the rendered title from becoming "404 — Page not found | FrameX | FrameX".
+  title: { absolute: '404 — Page not found | FrameX' },
   robots: { index: false },
 };
 
