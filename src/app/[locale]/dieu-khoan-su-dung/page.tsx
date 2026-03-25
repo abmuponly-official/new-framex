@@ -1,6 +1,7 @@
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import type { Metadata } from 'next';
 import type { Locale } from '@/lib/i18n/request';
+import { buildOpenGraph, buildAlternates } from '@/lib/seo';
 
 type Props = { params: { locale: string } };
 
@@ -8,17 +9,19 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const locale = params.locale as Locale;
   setRequestLocale(locale);
   const t = await getTranslations({ locale, namespace: 'terms' });
+  const description = locale === 'vi'
+    ? 'Các điều khoản sử dụng điều chỉnh việc truy cập và sử dụng website framex.vn, bao gồm quyền sở hữu trí tuệ và giới hạn trách nhiệm.'
+    : 'Terms governing access and use of framex.vn, including intellectual property rights and limitation of liability.';
   return {
     title: t('title'),
-    alternates: {
-      canonical: `/${locale}/dieu-khoan-su-dung`,
-      languages: { vi: '/vi/dieu-khoan-su-dung', en: '/en/dieu-khoan-su-dung' },
-    },
-    openGraph: {
+    description,
+    alternates: buildAlternates(locale, '/dieu-khoan-su-dung'),
+    openGraph: buildOpenGraph({
+      locale,
       title: t('title'),
+      description,
       url: `https://framex.vn/${locale}/dieu-khoan-su-dung`,
-      images: [{ url: 'https://framex.vn/images/og-default.png', width: 1200, height: 630, alt: 'FrameX' }],
-    },
+    }),
   };
 }
 

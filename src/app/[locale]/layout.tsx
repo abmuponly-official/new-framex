@@ -90,6 +90,18 @@ export default async function LocaleLayout({ children, params }: Props) {
   return (
     <html lang={locale} suppressHydrationWarning>
       <head>
+        {/*
+          og:locale, og:type, og:site_name — injected as raw <meta> tags here
+          because Next.js 14 App Router does NOT cascade these fields from the
+          layout-level openGraph to child pages that define their own openGraph
+          block. Injecting them in <head> guarantees they appear on EVERY page
+          regardless of child page metadata overrides.
+        */}
+        <meta property="og:locale" content={locale === 'vi' ? 'vi_VN' : 'en_US'} />
+        <meta property="og:locale:alternate" content={locale === 'vi' ? 'en_US' : 'vi_VN'} />
+        <meta property="og:type" content="website" />
+        <meta property="og:site_name" content="FrameX" />
+
         {/* DNS prefetch for external resources */}
         <link rel="dns-prefetch" href="https://fonts.googleapis.com" />
         <link rel="dns-prefetch" href="https://fonts.gstatic.com" />

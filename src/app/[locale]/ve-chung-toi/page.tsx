@@ -1,5 +1,6 @@
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import type { Metadata } from 'next';
+import { buildOpenGraph, buildAlternates } from '@/lib/seo';
 import type { Locale } from '@/lib/i18n/request';
 import Link from 'next/link';
 import { getSiteSettings, getSetting } from '@/lib/supabase/settings';
@@ -13,16 +14,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return {
     title: t('headline'),
     description: t('sub'),
-    alternates: {
-      canonical: `/${locale}/ve-chung-toi`,
-      languages: { vi: '/vi/ve-chung-toi', en: '/en/ve-chung-toi' },
-    },
-    openGraph: {
+    alternates: buildAlternates(locale, '/ve-chung-toi'),
+    openGraph: buildOpenGraph({
+      locale,
       title: t('headline'),
       description: t('sub'),
       url: `https://framex.vn/${locale}/ve-chung-toi`,
-      images: [{ url: 'https://framex.vn/images/og-default.png', width: 1200, height: 630, alt: 'FrameX' }],
-    },
+    }),
   };
 }
 

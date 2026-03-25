@@ -8,6 +8,7 @@ import { createClient } from '@/lib/supabase/server';
 import { t as tField } from '@/types/content';
 import type { Post } from '@/types/content';
 import JsonLd from '@/components/seo/JsonLd';
+import { buildOpenGraph, buildAlternates } from '@/lib/seo';
 
 type Props = { params: { locale: string; slug: string } };
 
@@ -29,21 +30,17 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     return {
       title,
       description,
-      alternates: {
-        canonical: `/${locale}/tin-tuc/${params.slug}`,
-        languages: {
-          vi: `/vi/tin-tuc/${params.slug}`,
-          en: `/en/tin-tuc/${params.slug}`,
-        },
-      },
-      openGraph: {
+      alternates: buildAlternates(locale, `/tin-tuc/${params.slug}`),
+      openGraph: buildOpenGraph({
+        locale,
         title,
         description,
+        url: `https://framex.vn/${locale}/tin-tuc/${params.slug}`,
+        image: data.cover_image ?? undefined,
         type: 'article',
         publishedTime: data.published_at ?? undefined,
         modifiedTime:  data.updated_at  ?? undefined,
-        images: data.cover_image ? [{ url: data.cover_image, width: 1200, height: 630, alt: title }] : [],
-      },
+      }),
       twitter: {
         card: 'summary_large_image',
         title,

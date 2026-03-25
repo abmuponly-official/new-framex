@@ -3,6 +3,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import type { Locale } from '@/lib/i18n/request';
 import JsonLd from '@/components/seo/JsonLd';
+import { buildOpenGraph, buildAlternates } from '@/lib/seo';
 
 type Props = { params: { locale: string } };
 
@@ -13,19 +14,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return {
     title: t('headline'),
     description: t('sub'),
-    alternates: {
-      canonical: `/${locale}/giai-phap-3-trong-1`,
-      languages: {
-        vi: '/vi/giai-phap-3-trong-1',
-        en: '/en/giai-phap-3-trong-1',
-      },
-    },
-    openGraph: {
+    alternates: buildAlternates(locale, '/giai-phap-3-trong-1'),
+    openGraph: buildOpenGraph({
+      locale,
       title: t('headline'),
       description: t('sub'),
       url: `https://framex.vn/${locale}/giai-phap-3-trong-1`,
-      images: [{ url: 'https://framex.vn/images/og-default.png', width: 1200, height: 630, alt: 'FrameX' }],
-    },
+    }),
   };
 }
 

@@ -1,6 +1,7 @@
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import type { Metadata } from 'next';
 import type { Locale } from '@/lib/i18n/request';
+import { buildOpenGraph, buildAlternates } from '@/lib/seo';
 
 type Props = { params: { locale: string } };
 
@@ -8,17 +9,19 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const locale = params.locale as Locale;
   setRequestLocale(locale);
   const t = await getTranslations({ locale, namespace: 'privacy' });
+  const description = locale === 'vi'
+    ? 'Tìm hiểu cách FrameX thu thập, sử dụng và bảo vệ thông tin cá nhân của bạn khi truy cập framex.vn.'
+    : 'Learn how FrameX collects, uses and protects your personal information when you visit framex.vn.';
   return {
     title: t('title'),
-    alternates: {
-      canonical: `/${locale}/chinh-sach-bao-mat`,
-      languages: { vi: '/vi/chinh-sach-bao-mat', en: '/en/chinh-sach-bao-mat' },
-    },
-    openGraph: {
+    description,
+    alternates: buildAlternates(locale, '/chinh-sach-bao-mat'),
+    openGraph: buildOpenGraph({
+      locale,
       title: t('title'),
+      description,
       url: `https://framex.vn/${locale}/chinh-sach-bao-mat`,
-      images: [{ url: 'https://framex.vn/images/og-default.png', width: 1200, height: 630, alt: 'FrameX' }],
-    },
+    }),
   };
 }
 

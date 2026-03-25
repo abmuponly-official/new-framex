@@ -1,5 +1,6 @@
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import type { Metadata } from 'next';
+import { buildOpenGraph, buildAlternates } from '@/lib/seo';
 import Link from 'next/link';
 import type { Locale } from '@/lib/i18n/request';
 
@@ -12,16 +13,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return {
     title: t('headline'),
     description: t('sub'),
-    alternates: {
-      canonical: `/${locale}/nha-thau`,
-      languages: { vi: '/vi/nha-thau', en: '/en/nha-thau' },
-    },
-    openGraph: {
+    alternates: buildAlternates(locale, '/nha-thau'),
+    openGraph: buildOpenGraph({
+      locale,
       title: t('headline'),
       description: t('sub'),
       url: `https://framex.vn/${locale}/nha-thau`,
-      images: [{ url: 'https://framex.vn/images/og-default.png', width: 1200, height: 630, alt: 'FrameX' }],
-    },
+    }),
   };
 }
 

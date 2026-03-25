@@ -1,5 +1,6 @@
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import type { Metadata } from 'next';
+import { buildOpenGraph, buildAlternates } from '@/lib/seo';
 import type { Locale } from '@/lib/i18n/request';
 import ContactForm from '@/components/sections/ContactForm';
 import { getSiteSettings, getSetting } from '@/lib/supabase/settings';
@@ -13,16 +14,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return {
     title: t('headline'),
     description: t('sub'),
-    alternates: {
-      canonical: `/${locale}/lien-he`,
-      languages: { vi: '/vi/lien-he', en: '/en/lien-he' },
-    },
-    openGraph: {
+    alternates: buildAlternates(locale, '/lien-he'),
+    openGraph: buildOpenGraph({
+      locale,
       title: t('headline'),
       description: t('sub'),
       url: `https://framex.vn/${locale}/lien-he`,
-      images: [{ url: 'https://framex.vn/images/og-default.png', width: 1200, height: 630, alt: 'FrameX' }],
-    },
+    }),
   };
 }
 
