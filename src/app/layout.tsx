@@ -12,7 +12,7 @@ export const metadata: Metadata = {
   openGraph: {
     siteName: 'FrameX',
     type: 'website',
-    images: [{ url: '/og-default.png', width: 1200, height: 630, alt: 'FrameX' }],
+    images: [{ url: '/images/og-default.png', width: 1200, height: 630, alt: 'FrameX' }],
   },
   twitter: {
     card: 'summary_large_image',
